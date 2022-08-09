@@ -7,11 +7,27 @@
     tools:context=".viewer.Viewer">
 
     <EditText
-        android:id="@+id/editTextTextPersonName"
+        android:id="@+id/et_mail_field"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:ems="10"
         android:inputType="textMultiLine"
         android:text="Name"/>
+
+    <Button
+        android:id="@+id/btn_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/_new" />
+
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/save" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
