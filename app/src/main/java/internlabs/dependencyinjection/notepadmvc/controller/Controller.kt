@@ -28,8 +28,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener {
 
     override fun new() {
         val textFromFile =  File("fileName.txt")
-            .bufferedReader()
-            .use { it.readText(); }
     }
 
     /*private fun isOk(file: File): Boolean {
