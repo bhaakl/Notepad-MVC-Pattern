@@ -4,7 +4,7 @@ interface OurTasks {
 
     //region start
     fun new()
-    fun open(fileName: String)
+    fun open()
     fun save(fileName: String)
     fun saveAs()
     fun print()
@@ -53,6 +53,4 @@ interface OurTasks {
 
     // Theme
     fun changeTheme()
-
-
 }
