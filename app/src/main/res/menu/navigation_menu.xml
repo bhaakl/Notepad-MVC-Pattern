@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/newFile"
+        android:icon="@drawable/new_file"
+
+        android:title="Новый"/>
+    <item android:id="@+id/openFile"
+        android:icon="@drawable/open_file"
+
+        android:title="Открыть"/>
+
+    <item android:id="@+id/Save"
+        android:icon="@drawable/save_file"
+
+        android:title="Сохранить"/>
+
+    <item android:id="@+id/saveAs"
+        android:icon="@drawable/save_as"
+
+        android:title=" Сохранить как"/>
+
+    <item android:id="@+id/searchText"
+        android:icon="@drawable/search_icon"
+
+        android:title="Поиск в тексте"/>
+
+    <item android:id="@+id/Cancel"
+        android:icon="@drawable/undo"
+
+        android:title="Отменить"/>
+
+    <item android:id="@+id/font"
+        android:icon="@drawable/font"
+
+        android:title="Шрифт"/>
+
+    <item android:id="@+id/send"
+        android:icon="@drawable/send"
+
+        android:title="Отправить"/>
+
+    <item android:id="@+id/howToUse"
+        android:icon="@drawable/how_to_use"
+
+        android:title="Как пользоваться"/>
+    <item android:id="@+id/recent"
+        android:icon="@drawable/recent"
+
+        android:title="Недавние"/>
+
+
+
+
+
+</menu>
