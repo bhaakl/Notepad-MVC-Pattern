@@ -32,7 +32,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener {
             .use { it.readText(); }
     }
 
-    private fun isOk(file: File): Boolean {
+    /*private fun isOk(file: File): Boolean {
         val fileName = file.name
         if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
             val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
@@ -48,7 +48,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener {
             }
         }
         return false
-    }
+    }*/
 
     override fun open(fileName: String) {
         TODO("Not yet implemented")
