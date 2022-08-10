@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">NotePadMVC</string>
+    <string name="app_name">NotepadMVC</string>
+    <string name="save">Save</string>
+    <string name="_new">new</string>
 </resources>
