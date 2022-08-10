@@ -9,6 +9,7 @@ import java.io.File
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener {
     private var viewer: Viewer
     //
+    ///
 
     init {
         this.viewer = viewer
