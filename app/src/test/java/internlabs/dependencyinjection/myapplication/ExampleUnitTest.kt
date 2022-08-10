@@ -1,4 +1,4 @@
-package com.example.notepadmvc
+package internlabs.dependencyinjection.myapplication
 
 import org.junit.Test
 
