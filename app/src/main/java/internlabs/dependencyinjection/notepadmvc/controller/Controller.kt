@@ -8,8 +8,7 @@ import java.io.File
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener {
     private var viewer: Viewer
-    //
-    ///
+    // .гргрго
 
     init {
         this.viewer = viewer
