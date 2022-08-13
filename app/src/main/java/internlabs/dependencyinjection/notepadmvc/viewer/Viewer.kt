@@ -6,7 +6,7 @@ import androidx.core.view.GravityCompat
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 
-class Viewer:  AppCompatActivity() {
+class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
 
@@ -22,17 +22,15 @@ class Viewer:  AppCompatActivity() {
         initListeners()
     }
 
-
     private fun initListeners() = with(binding) {
         imageMenu.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
-        navigationView.setNavigationItemSelectedListener (controller)
+        navigationView.setNavigationItemSelectedListener(controller)
     }
 
     fun setText(string: String) {
-
+        TODO("abcd")
     }
-
 
 }
