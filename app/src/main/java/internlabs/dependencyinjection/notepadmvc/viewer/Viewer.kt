@@ -27,16 +27,20 @@ class Viewer : AppCompatActivity() {
             drawerLayout.open()
         }
 
-        navigationView.setNavigationItemSelectedListener { menuItem ->
+        navigationView.setNavigationItemSelectedListener(controller)
+
+        /*navigationView.setNavigationItemSelectedListener { menuItem ->
             // Handle menu item selected
-            menuItem.isChecked = true
+            //menuItem.isChecked = true
             drawerLayout.close()
             true
-        }
+        }*/
+    }
+    fun close(){
+        binding.drawerLayout.close()
     }
 
     fun setText(string: String) {
-        TODO("abcd")
     }
 
 }

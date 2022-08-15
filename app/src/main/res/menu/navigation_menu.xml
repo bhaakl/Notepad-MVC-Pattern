@@ -5,7 +5,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/subMenu1"
-            android:title="File">
+            android:title="@string/file">
             <menu>
                 <item
                     android:id="@+id/newFile"
@@ -46,7 +46,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/subMenu2"
-            android:title="Edit">
+            android:title="@string/edit">
             <menu>
 
                 <item
@@ -88,7 +88,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/subMenu3"
-            android:title="Other">
+            android:title="@string/other">
             <menu>
 
                 <item

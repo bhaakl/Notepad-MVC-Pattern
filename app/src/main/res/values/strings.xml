@@ -14,4 +14,7 @@
     <string name="cut">Cut</string>
     <string name="copy">Copy</string>
     <string name="paste">Paste</string>
+    <string name="file">File</string>
+    <string name="edit">Edit</string>
+    <string name="other">Other</string>
 </resources>

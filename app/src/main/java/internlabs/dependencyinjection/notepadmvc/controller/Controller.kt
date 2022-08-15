@@ -27,6 +27,21 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         this.viewer = viewer
     }
 
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.openFile -> {
+                open()
+            }
+            R.id.saveAs -> {
+                saveAs()
+            }
+        }
+        viewer.close()
+        item.isChecked = !item.isChecked
+        println(".....................")
+        return true
+    }
+
     override fun new() {
         val textFromFile = File("fileName.txt")
     }
@@ -227,16 +242,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun changeTheme() {
         //  TODO("Not yet implemented")
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.openFile -> {
-
-                open()
-            }
-        }
-        return true
     }
 
     override fun onClick(v: View?) {
