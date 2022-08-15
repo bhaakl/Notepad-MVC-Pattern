@@ -31,6 +31,17 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="top|left"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:autofillHints="false"
+            android:background="@color/white"
+            android:inputType="textMultiLine"
+            android:maxLength="6000000"
+            tools:ignore="LabelFor,RtlHardcoded"/>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
