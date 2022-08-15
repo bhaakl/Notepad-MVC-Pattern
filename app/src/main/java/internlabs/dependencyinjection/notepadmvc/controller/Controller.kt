@@ -1,8 +1,10 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
+import android.telecom.PhoneAccount.builder
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -10,18 +12,23 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
+import java.util.stream.DoubleStream.builder
+import java.util.stream.IntStream.builder
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
+   // lateinit var alertDialog: AlertDialog.Builder
 
     init {
         this.viewer = viewer
@@ -34,6 +41,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             }
             R.id.saveAs -> {
                 saveAs()
+            }
+            R.id.about_app -> {
+               viewer.showAlertDialog()
             }
         }
         viewer.close()
@@ -113,7 +123,17 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun aboutApp() {
+//        alertDialog = AlertDialog.Builder(viewer)
+//        alertDialog.setTitle("AboutApp")
+//            .setMessage("")
+//            .setCancelable(true)
+//            .setPositiveButton("Ok"){dialogInterface,it ->
+//                dialogInterface.cancel()
+//            }
+//        alertDialog.show()
+
         //TODO("Not yet implemented")
+
     }
 
     override fun sentToEmail() {
