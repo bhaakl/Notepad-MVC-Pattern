@@ -1,5 +1,17 @@
 <resources>
     <string name="app_name">NotepadMVC</string>
     <string name="save">Save</string>
-    <string name="_new">new</string>
+    <string name="_new">New</string>
+    <string name="open">Open</string>
+    <string name="save_as">Save as</string>
+    <string name="search_in">Search in</string>
+    <string name="recent">Recent</string>
+    <string name="undo">Undo</string>
+    <string name="redo">redo</string>
+    <string name="settings">settings</string>
+    <string name="send">Send</string>
+    <string name="how_to_use">How to use?</string>
+    <string name="cut">Cut</string>
+    <string name="copy">Copy</string>
+    <string name="paste">Paste</string>
 </resources>

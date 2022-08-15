@@ -23,10 +23,16 @@ class Viewer : AppCompatActivity() {
     }
 
     private fun initListeners() = with(binding) {
-        imageMenu.setOnClickListener {
-            drawerLayout.openDrawer(GravityCompat.START)
+        imageMenu.setNavigationOnClickListener {
+            drawerLayout.open()
         }
-        navigationView.setNavigationItemSelectedListener(controller)
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            // Handle menu item selected
+            menuItem.isChecked = true
+            drawerLayout.close()
+            true
+        }
     }
 
     fun setText(string: String) {
