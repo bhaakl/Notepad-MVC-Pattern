@@ -23,45 +23,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
 
-
-
     init {
         this.viewer = viewer
     }
 
-
-   /* override fun onClick(v: View) {
-        when(v.id) {
-            R.id.btn_new -> {
-                new()
-            }
-            R.id.btn_save -> {
-
-            }
-        }
-    }*/
-
     override fun new() {
-        val textFromFile =  File("fileName.txt")
+        val textFromFile = File("fileName.txt")
     }
-
-    /*private fun isOk(file: File): Boolean {
-        val fileName = file.name
-        if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
-            val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
-            // System.out.println(extensionOfFile);
-            if (extensionOfFile == "ntp" || extensionOfFile == "kt" || extensionOfFile == "swift" || extensionOfFile == "java") {
-                val erkin = file.length().toInt()
-                val max = 5629273
-                return if (erkin < max) {
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-        return false
-    }*/
 
     override fun open() {
         try {
@@ -113,17 +81,16 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
 
-
     override fun save(fileName: String) {
-       // TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun saveAs() {
-       // TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun print() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun recent() {
@@ -143,7 +110,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun redo() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun undo() {
@@ -151,7 +118,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun cut() {
-       // TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun copy() {
@@ -159,11 +126,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun insert() {
-       // TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun delete() {
-       // TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun find() {
@@ -171,11 +138,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun replace() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun selectAll() {
-       // TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun dateAndTime() {
@@ -207,11 +174,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun makeItalic() {
-    //    TODO("Not yet implemented")
+        //    TODO("Not yet implemented")
     }
 
     override fun makeCursive() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun makeUnderlined() {
@@ -219,11 +186,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun makeCrossedOut() {
-    //    TODO("Not yet implemented")
+        //    TODO("Not yet implemented")
     }
 
     override fun makeSubscript() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun makeSuperscript() {
@@ -231,11 +198,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun textColor() {
-    //    TODO("Not yet implemented")
+        //    TODO("Not yet implemented")
     }
 
     override fun textBackground() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun alignLeft() {
@@ -243,11 +210,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun alignRight() {
-    //    TODO("Not yet implemented")
+        //    TODO("Not yet implemented")
     }
 
     override fun alignLeftAndLeft() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun lineSpace() {
@@ -255,15 +222,15 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun letterSpace() {
-    //    TODO("Not yet implemented")
+        //    TODO("Not yet implemented")
     }
 
     override fun changeTheme() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.openFile -> {
 
                 open()
