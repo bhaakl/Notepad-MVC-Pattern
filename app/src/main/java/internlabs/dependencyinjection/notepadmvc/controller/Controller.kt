@@ -10,8 +10,10 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
@@ -23,6 +25,7 @@ import java.io.InputStream
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
+   // lateinit var alertDialog: AlertDialog.Builder
 
     init {
         this.viewer = viewer
@@ -35,6 +38,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             }
             R.id.saveAs -> {
                 saveAs()
+            }
+            R.id.about_app -> {
+               viewer.showAlertDialog()
             }
         }
         viewer.close()
