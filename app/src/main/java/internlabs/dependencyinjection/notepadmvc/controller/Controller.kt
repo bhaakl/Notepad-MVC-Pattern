@@ -25,7 +25,6 @@ import java.io.InputStream
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
-   // lateinit var alertDialog: AlertDialog.Builder
 
     init {
         this.viewer = viewer
@@ -40,7 +39,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 saveAs()
             }
             R.id.about_app -> {
-               viewer.showAlertDialog()
+                aboutApp()
             }
         }
         viewer.close()
@@ -91,7 +90,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             var len = 0
             while (inputStream!!.read(buffer)
                     .also { len = it } != -1
-            ) { // TODO Stream нельзя использовать
+            ) {
                 outputStream.write(buffer, 0, len) // TODO Stream нельзя использовать
             }
             outputStream.toByteArray() // TODO Stream нельзя использовать
@@ -120,7 +119,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun aboutApp() {
-        //TODO("Not yet implemented")
+        viewer.showAlertDialog()
     }
 
     override fun sentToEmail() {
