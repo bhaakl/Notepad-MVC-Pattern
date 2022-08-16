@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
@@ -28,17 +29,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.openFile -> {
-                open()
-            }
-            R.id.saveAs -> {
-                saveAs()
-            }
-        }
-        viewer.close()
-        item.isChecked = !item.isChecked
-        println(".....................")
+        item.isChecked = true
+        viewer.getBinding().drawerLayout.close()
         return true
     }
 
