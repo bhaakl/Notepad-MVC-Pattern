@@ -2,7 +2,6 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 

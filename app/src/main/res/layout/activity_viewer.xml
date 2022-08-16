@@ -31,6 +31,18 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
+        <!-- <EditText
+             android:id="@+id/et_main_field"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             app:layout_constraintBottom_toBottomOf="parent"
+             app:layout_constraintTop_toBottomOf="@id/line1"
+             android:inputType="textMultiLine"
+             android:gravity="top|start"
+             android:text="@string/_new"
+             android:importantForAutofill="no"
+             tools:ignore="LabelFor" />-->
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
