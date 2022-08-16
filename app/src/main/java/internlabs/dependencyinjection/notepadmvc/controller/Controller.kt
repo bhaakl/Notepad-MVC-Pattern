@@ -93,7 +93,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             ) {
                 outputStream.write(buffer, 0, len) // TODO Stream нельзя использовать
             }
-            outputStream.toByteArray() // TODO Stream нельзя использовать
+            outputStream.toByteArray()
         } catch (ex: Exception) {
             Log.e("Error", ex.message.toString())
             Toast.makeText(context, "getText error:" + ex.message, Toast.LENGTH_LONG).show()
