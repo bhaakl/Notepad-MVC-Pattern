@@ -32,6 +32,7 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <EditText
+            android:id="@+id/et_main_field"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="top|left"
