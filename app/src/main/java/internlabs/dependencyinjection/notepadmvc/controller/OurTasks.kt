@@ -5,7 +5,7 @@ interface OurTasks {
     //region start
     fun new()
     fun open()
-    fun save(fileName: String)
+    fun save()
     fun saveAs()
     fun print()
     fun recent()

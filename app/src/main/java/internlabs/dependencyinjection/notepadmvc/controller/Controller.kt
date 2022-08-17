@@ -1,92 +1,82 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
+import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
+import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.InputStream
+import java.io.*
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
-
-
+    private var uri: Uri = Uri.parse("")
 
     init {
         this.viewer = viewer
     }
 
-
-   /* override fun onClick(v: View) {
-        when(v.id) {
-            R.id.btn_new -> {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.openFile -> {
+                open()
+            }
+            R.id.newFile -> {
                 new()
             }
-            R.id.btn_save -> {
-
+            R.id.save -> {
+                save()
             }
+            R.id.saveAs -> {
+                saveAs()
+            }
+            R.id.about_app -> {
+                viewer.showAlertDialog()
+            }
+
         }
-    }*/
+        viewer.close()
+        item.isChecked = !item.isChecked
+        return true
+    }
 
     override fun new() {
-        val textFromFile =  File("fileName.txt")
+        viewer.setText("")
+        val outputFile: String =
+            viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
+        val file1 = File(outputFile)
+        uri = FileProvider.getUriForFile(viewer,
+            BuildConfig.APPLICATION_ID + ".provider",
+            file1)
     }
-
-    /*private fun isOk(file: File): Boolean {
-        val fileName = file.name
-        if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
-            val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
-            // System.out.println(extensionOfFile);
-            if (extensionOfFile == "ntp" || extensionOfFile == "kt" || extensionOfFile == "swift" || extensionOfFile == "java") {
-                val erkin = file.length().toInt()
-                val max = 5629273
-                return if (erkin < max) {
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-        return false
-    }*/
 
     override fun open() {
-        try {
-            val fileIntent = Intent(Intent.ACTION_GET_CONTENT)
-            fileIntent.addCategory(Intent.CATEGORY_OPENABLE)
-            fileIntent.type = "*/*"
-            // TODO .kt, .java, .kotlin, .swift, .ntp нужно
-            //TODO здесь поставить такие фильтры
-            filePicker!!.launch(fileIntent)
-        } catch (ex: Exception) {
-            Log.e("Error", ex.message!!)
-            Toast.makeText(viewer, ex.message.toString(), Toast.LENGTH_LONG).show()
-        }
-
+        openDoc.launch(arrayOf("*/*"));
     }
 
-    var filePicker: ActivityResultLauncher<Intent>? = viewer.registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        if (result.resultCode == AppCompatActivity.RESULT_OK) {
-            val intent1 = result.data
-            val uri = intent1!!.data
-            val byteData = getText(viewer, uri)
-            // TODO
-            viewer.setText(String(byteData!!))
+    private val openDoc = viewer.registerForActivityResult(ActivityResultContracts.OpenDocument())
+    { uri1 ->
+        if (uri1 != null) {
+            if (isOk(uri1)) {
+                val byteData = getText(viewer, uri1)
+                println("byteData    ${byteData?.let { String(it) }}")
+                byteData?.let { String(it) }?.let { viewer.setText(it) }
+                uri = uri1
+            } else {
+                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+            }
         }
     }
 
@@ -112,14 +102,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-
-
-    override fun save(fileName: String) {
-       // TODO("Not yet implemented")
+    override fun save() {
+        saveToFile(uri)
     }
 
     override fun saveAs() {
-       // TODO("Not yet implemented")
+        val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
+        saveAsDoc.launch(u)
     }
 
     override fun print() {
@@ -262,19 +251,62 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
       //  TODO("Not yet implemented")
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.openFile -> {
-
-                open()
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.et_main_field -> {
+                viewer.keyBoardShow()
             }
         }
-        return true
     }
 
-    override fun onClick(v: View?) {
-        TODO("Not yet implemented")
+    //region  Медер Шермаматов
+    //-- служебный метод Фильтр для файлов()
+    private fun isOk(uri: Uri): Boolean {
+        val fileName = DocumentFile.fromSingleUri(viewer, uri)?.name
+        if (fileName != null) {
+            if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
+                val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
+                if (extensionOfFile == "ntp" || extensionOfFile == "kt" || extensionOfFile == "swift" || extensionOfFile == "java") {
+                    val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
+                    val max = 5629273
+                    if (size != null) {
+                        return size < max
+                    }
+                }
+            }
+        }
+        return false
     }
+    // -- служебный метод Сохранение в файл()
+    private fun saveToFile(uri: Uri) {
+        val text = viewer.getText()
+        try {
+            viewer.contentResolver.openFileDescriptor(uri, "drwx")?.use {content ->
+                FileOutputStream(content.fileDescriptor).use { fos ->
+                    fos.write(text.toByteArray())
+                    fos.flush()
+                    fos.close()
+                }
+            }
+        } catch (e: FileNotFoundException) {
+            println("нетуу")
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    // -- служебный метод Сохранить как()
+    private val saveAsDoc = viewer.registerForActivityResult(ActivityResultContracts
+        .CreateDocument("application/ntp")){
+        if (it != null) {
+            if (isOk(it)){
+                saveToFile(it)
+                uri = it
+                viewer.setText("")
+            } else {
+                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+            }
+        }
 
-
+    }
+    //endregion
 }
