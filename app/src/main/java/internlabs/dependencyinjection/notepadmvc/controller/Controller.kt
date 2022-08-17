@@ -1,13 +1,17 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
+import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.telecom.PhoneAccount.builder
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -26,6 +30,7 @@ import java.io.InputStream
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
+    private lateinit var dialog: Dialog
 
     init {
         this.viewer = viewer
@@ -38,6 +43,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             }
             R.id.saveAs -> {
                 saveAs()
+            }
+            R.id.about_app -> {
+                aboutApp()
             }
         }
         viewer.close()
@@ -117,7 +125,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun aboutApp() {
-        //TODO("Not yet implemented")
+        dialog = Dialog(viewer)
+        dialog.setContentView(R.layout.dialog_layout)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
     }
 
     override fun sentToEmail() {

@@ -1,14 +1,18 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
-    lateinit var alertDialog: AlertDialog.Builder
 
     init {
         controller = Controller(viewer = this)
@@ -18,7 +22,6 @@ class Viewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         initListeners()
     }
 

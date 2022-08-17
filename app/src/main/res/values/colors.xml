@@ -12,5 +12,6 @@
     <color name="colorAccent">#FF5252</color>
     <color name="colorPrimaryText">#212121</color>
     <color name="ColorGreen">#32CD32</color>
+    <color name="grey">#939693</color>
 
 </resources>
