@@ -11,7 +11,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
@@ -23,15 +22,56 @@ import java.io.InputStream
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
+    private val editor: Editor = Editor(viewer)
 
     init {
         this.viewer = viewer
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        item.isChecked = true
-        viewer.getBinding().drawerLayout.close()
-        return true
+        return when (item.itemId) {
+            R.id.newFile -> {
+                new()
+                item.isChecked = !item.isChecked
+                viewer.getBinding().drawerLayout.close()
+                item.isEnabled = false
+                true
+            }
+            R.id.openFile -> {
+                open()
+                item.isChecked = !item.isChecked
+                viewer.getBinding().drawerLayout.close()
+                true
+            }
+            R.id.copy -> {
+                item.isChecked = !item.isChecked
+                viewer.getBinding().drawerLayout.close()
+                val startSelection: Int = viewer.getBinding().editText.selectionStart
+                val endSelection: Int = viewer.getBinding().editText.selectionEnd
+                val selectedText: String = viewer.getBinding().editText.text.toString()
+                    .substring(startSelection, endSelection)
+                println("selected text: $selectedText")
+                editor.copy(selectedText)
+                true
+            }
+            R.id.paste -> {
+                item.isChecked = !item.isChecked
+                viewer.getBinding().drawerLayout.close()
+                editor.paste(item)
+            }
+            R.id.cut -> {
+                item.isChecked = !item.isChecked
+                viewer.getBinding().drawerLayout.close()
+                val startSelection: Int = viewer.getBinding().editText.selectionStart
+                val endSelection: Int = viewer.getBinding().editText.selectionEnd
+                val selectedText: String = viewer.getBinding().editText.text.toString()
+                    .substring(startSelection, endSelection)
+                editor.cut(selectedText, startSelection, endSelection)
+                true
+            }
+            else -> false
+
+        }
     }
 
     override fun new() {
@@ -87,7 +127,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-
     override fun save(fileName: String) {
         // TODO("Not yet implemented")
     }
@@ -113,46 +152,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun exit() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun redo() {
-        //  TODO("Not yet implemented")
-    }
-
-    override fun undo() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun cut() {
-        // TODO("Not yet implemented")
-    }
-
-    override fun copy() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun insert() {
-        // TODO("Not yet implemented")
-    }
-
-    override fun delete() {
-        // TODO("Not yet implemented")
-    }
-
-    override fun find() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun replace() {
-        //  TODO("Not yet implemented")
-    }
-
-    override fun selectAll() {
-        // TODO("Not yet implemented")
-    }
-
-    override fun dateAndTime() {
         //TODO("Not yet implemented")
     }
 

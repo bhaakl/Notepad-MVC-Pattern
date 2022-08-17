@@ -13,18 +13,6 @@ interface OurTasks {
     fun sentToEmail()
     fun exit()
 
-    // edit
-    fun redo()
-    fun undo()
-    fun cut()
-    fun copy()
-    fun insert()
-    fun delete()
-    fun find()
-    fun replace()
-    fun selectAll()
-    fun dateAndTime()
-
     // View
     fun zoomIn()
     fun zoomOut()
