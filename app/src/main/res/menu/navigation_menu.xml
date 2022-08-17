@@ -101,6 +101,12 @@
                     android:icon="@drawable/ic_how_to_use"
                     android:title="@string/how_to_use" />
 
+                <item
+                    android:id="@+id/about_app"
+                    android:title="@string/about_app"
+                    android:icon="@drawable/ic_baseline_logo_dev_24"/>
+
+
             </menu>
         </item>
 

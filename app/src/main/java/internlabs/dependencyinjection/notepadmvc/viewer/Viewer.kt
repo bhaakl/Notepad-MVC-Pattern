@@ -2,6 +2,7 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
@@ -10,6 +11,7 @@ import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBindi
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
+    lateinit var alertDialog: AlertDialog.Builder
 
     init {
         controller = Controller(viewer = this)
@@ -62,4 +64,20 @@ class Viewer : AppCompatActivity() {
         binding.editText.setSelection(cursor + strAdd.length)
     }
 
+    fun showAlertDialog(){
+        alertDialog = AlertDialog.Builder(this)
+        alertDialog.setTitle("AboutApp")
+            .setMessage("Project developers:Notepad MVC pattern\n" +
+                    "Team: Dependency injection\n" +
+                    "Медербек Шермаматов\n" +
+                    "Умут Арпидинов\n" +
+                    "Атабек Шамшидинов\n" +
+                    "Байыш Бегалиев\n" +
+                    "Мурат Жумалиев")
+            .setCancelable(true)
+            .setPositiveButton("Ok"){ dialogInterface, _ ->
+                dialogInterface.cancel()
+            }
+        alertDialog.show()
+    }
 }
