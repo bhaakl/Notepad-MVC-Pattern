@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true">
 
+
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/imageMenu"
                 style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
@@ -30,19 +31,32 @@
                 app:navigationIcon="@drawable/ic_menu_24dp"
                 app:title="@string/app_name" />
 
+
         </com.google.android.material.appbar.AppBarLayout>
 
         <EditText
             android:id="@+id/et_main_field"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="top|left"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_height="702dp"
             android:autofillHints="false"
             android:background="@color/white"
+            android:gravity="top|left"
             android:inputType="textMultiLine"
             android:maxLength="6000000"
-            tools:ignore="LabelFor,RtlHardcoded"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:ignore="LabelFor,RtlHardcoded" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_gravity="bottom"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:menu="@menu/bottom_navigation" />
+
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -53,4 +67,6 @@
         android:layout_gravity="start"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/navigation_menu" />
+
+
 </androidx.drawerlayout.widget.DrawerLayout>
