@@ -68,6 +68,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 cut(selectedText, startSelection, endSelection)
                 true
             }
+            R.id.about_app -> {
+                viewer.showAlertDialog()
+                true
+            }
             else -> false
 
         }
