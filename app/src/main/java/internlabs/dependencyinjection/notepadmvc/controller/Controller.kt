@@ -28,11 +28,20 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.openFile -> {
+                open()
+            }
             R.id.newFile -> {
                 new()
             }
-            R.id.openFile -> {
-                open()
+            R.id.save -> {
+                save()
+            }
+            R.id.saveAs -> {
+                saveAs()
+            }
+            R.id.about_app -> {
+                viewer.showAlertDialog()
             }
             R.id.copy -> {
                 val startSelection: Int = viewer.getBinding().editText.selectionStart
@@ -51,9 +60,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 val selectedText: String = viewer.getBinding().editText.text.toString()
                     .substring(startSelection, endSelection)
                 cut(selectedText, startSelection, endSelection)
-            }
-            R.id.about_app -> {
-                viewer.showAlertDialog()
             }
         }
         item.isChecked = !item.isChecked;

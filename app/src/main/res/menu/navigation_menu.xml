@@ -106,16 +106,19 @@
                 <item
                     android:id="@+id/send"
                     android:icon="@drawable/ic_send"
+                    android:checkable="true"
                     android:title="@string/send" />
 
                 <item
                     android:id="@+id/howToUse"
                     android:icon="@drawable/ic_how_to_use"
+                    android:checkable="true"
                     android:title="@string/how_to_use" />
 
                 <item
                     android:id="@+id/about_app"
                     android:icon="@drawable/ic_baseline_logo_dev_24"
+                    android:checkable="true"
                     android:title="@string/about_app" />
 
             </menu>
