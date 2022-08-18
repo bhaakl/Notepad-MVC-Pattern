@@ -1,7 +1,13 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
+import android.view.View
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
@@ -26,44 +32,81 @@ class Viewer : AppCompatActivity() {
     private fun initListeners() = with(binding) {
         imageMenu.setNavigationOnClickListener {
             drawerLayout.open()
+            binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
         }
 
         navigationView.setNavigationItemSelectedListener(controller)
         fab.setOnClickListener(controller)
-        bolt.setOnClickListener{controller.makeBold()}
-        italic.setOnClickListener{controller.makeItalic()}
-        underline.setOnClickListener{controller.makeUnderlined()}
-
-        /*navigationView.setNavigationItemSelectedListener { menuItem ->
-            // Handle menu item selected
-            //menuItem.isChecked = true
-            drawerLayout.close()
-            true
-        }*/
+        bolt.setOnClickListener { controller.makeBold() }
+        italic.setOnClickListener { controller.makeItalic() }
+        underline.setOnClickListener { controller.makeUnderlined() }
+        controller.size()
     }
 
-    fun close(){
-        binding.drawerLayout.close()
+    fun getBinding(): ActivityViewerBinding {
+        return binding
     }
 
-    fun setText(string: String) {
+    fun toastCopied() {
+        Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
     }
 
-    fun animateFab() = with(binding){
+    fun toastPasted() {
+        Toast.makeText(this, "Pasted", Toast.LENGTH_SHORT).show()
+    }
+
+    fun toastCut() {
+        Toast.makeText(this, "Cut Out", Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * @param setSelection  переносит курсор в конец строки у edit text
+     */
+
+    fun setTextFromFile(string: String) {
+        binding.editText.setText(string)
+        binding.editText.setSelection(binding.editText.text.length)
+    }
+
+    fun setText(strAdd: String) {
+        if (strAdd.isEmpty()) {
+            return
+        }
+        val old = binding.editText.text.toString()
+        val cursor: Int = binding.editText.selectionStart
+        val leftStr = old.substring(0, cursor)
+        val rightStr = old.substring(cursor)
+        if (binding.editText.text.isEmpty())
+            binding.editText.setText(strAdd)
+        else
+            binding.editText.setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
+        binding.editText.setSelection(cursor + strAdd.length)
+    }
+
+    fun getText(): String {
+        return binding.editText.text.toString()
+    }
+
+    fun keyBoardShow() {
+        // убирает клавиатуру
+        binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+    }
+
+    fun animateFab() = with(binding) {
         if (isOpenFab) {
-          fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.rotat_forward))
-          bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
-          italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
-          underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
-          bolt.isClickable = false
-          italic.isClickable = false
-          underline.isClickable = false
-          isOpenFab = false
+            fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.rotat_forward))
+            bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            bolt.isClickable = false
+            italic.isClickable = false
+            underline.isClickable = false
+            isOpenFab = false
         } else {
-            fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.rotat_backforward))
-            bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_open))
-            italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_open))
-            underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_open))
+            fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.rotat_backforward))
+            bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
             bolt.isClickable = true
             italic.isClickable = true
             underline.isClickable = true
@@ -71,5 +114,10 @@ class Viewer : AppCompatActivity() {
         }
 
     }
+
+    fun close() {
+        binding.drawerLayout.close()
+    }
+
 
 }
