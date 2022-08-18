@@ -1,6 +1,7 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,7 @@ class Viewer : AppCompatActivity() {
     private fun initListeners() = with(binding) {
         imageMenu.setNavigationOnClickListener {
             drawerLayout.open()
+            binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
         }
 
         navigationView.setNavigationItemSelectedListener(controller)
@@ -47,6 +49,14 @@ class Viewer : AppCompatActivity() {
 
     fun toastCut() {
         Toast.makeText(this, "Cut Out", Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * @param setSelection  переносит курсор в конец строки у edit text
+     */
+    fun setTextFromFile(string: String) {
+        binding.editText.setText(string)
+        binding.editText.setSelection(binding.editText.text.length)
     }
 
     fun setText(strAdd: String) {
@@ -79,5 +89,18 @@ class Viewer : AppCompatActivity() {
                 dialogInterface.cancel()
             }
         alertDialog.show()
+    }
+
+    fun getText(): String {
+        return binding.editText.text.toString()
+    }
+
+    fun keyBoardShow() {
+        // убирает клавиатуру
+        binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+    }
+
+    fun close(){
+        binding.drawerLayout.close()
     }
 }
