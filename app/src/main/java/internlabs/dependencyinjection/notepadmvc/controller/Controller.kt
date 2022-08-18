@@ -28,53 +28,38 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+        when (item.itemId) {
             R.id.newFile -> {
                 new()
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
-                item.isEnabled = false
-                true
             }
             R.id.openFile -> {
                 open()
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
-                true
             }
             R.id.copy -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
                 val startSelection: Int = viewer.getBinding().editText.selectionStart
                 val endSelection: Int = viewer.getBinding().editText.selectionEnd
                 val selectedText: String = viewer.getBinding().editText.text.toString()
                     .substring(startSelection, endSelection)
                 println("selected text: $selectedText")
                 copy(selectedText)
-                true
             }
             R.id.paste -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
                 paste(item)
             }
             R.id.cut -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
                 val startSelection: Int = viewer.getBinding().editText.selectionStart
                 val endSelection: Int = viewer.getBinding().editText.selectionEnd
                 val selectedText: String = viewer.getBinding().editText.text.toString()
                     .substring(startSelection, endSelection)
                 cut(selectedText, startSelection, endSelection)
-                true
             }
             R.id.about_app -> {
                 viewer.showAlertDialog()
-                true
             }
-            else -> false
-
         }
+        item.isChecked = !item.isChecked;
+        viewer.getBinding().drawerLayout.close()
+        return true
     }
 
     override fun new() {

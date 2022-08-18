@@ -64,18 +64,20 @@ class Viewer : AppCompatActivity() {
         binding.editText.setSelection(cursor + strAdd.length)
     }
 
-    fun showAlertDialog(){
+    fun showAlertDialog() {
         alertDialog = AlertDialog.Builder(this)
         alertDialog.setTitle("AboutApp")
-            .setMessage("Project developers:Notepad MVC pattern\n" +
-                    "Team: Dependency injection\n" +
-                    "Медербек Шермаматов\n" +
-                    "Умут Арпидинов\n" +
-                    "Атабек Шамшидинов\n" +
-                    "Байыш Бегалиев\n" +
-                    "Мурат Жумалиев")
+            .setMessage(
+                "Project developers:Notepad MVC pattern\n" +
+                        "Team: Dependency injection\n" +
+                        "Медербек Шермаматов\n" +
+                        "Умут Арпидинов\n" +
+                        "Атабек Шамшидинов\n" +
+                        "Байыш Бегалиев\n" +
+                        "Мурат Жумалиев"
+            )
             .setCancelable(true)
-            .setPositiveButton("Ok"){ dialogInterface, _ ->
+            .setPositiveButton("Ok") { dialogInterface, _ ->
                 dialogInterface.cancel()
             }
         alertDialog.show()
