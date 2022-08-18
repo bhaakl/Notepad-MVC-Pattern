@@ -2,23 +2,24 @@ package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.telecom.PhoneAccount.builder
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
@@ -200,19 +201,37 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun makeBold() {
-        //TODO("Not yet implemented")
+
+        val editText = viewer.findViewById<EditText>(R.id.et_main_field)
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(StyleSpan(Typeface.BOLD)
+            ,editText.selectionStart
+            ,editText.selectionEnd,0)
+        editText.text = spannableString
     }
 
     override fun makeItalic() {
-        //    TODO("Not yet implemented")
+
+        val editText = viewer.findViewById<EditText>(R.id.et_main_field)
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(StyleSpan(Typeface.ITALIC)
+            ,editText.selectionStart
+            ,editText.selectionEnd,0)
+        editText.text = spannableString
+    }
+
+    override fun makeUnderlined() {
+
+        val editText = viewer.findViewById<EditText>(R.id.et_main_field)
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(UnderlineSpan()
+            ,editText.selectionStart
+            ,editText.selectionEnd,0)
+        editText.text = spannableString
     }
 
     override fun makeCursive() {
         //  TODO("Not yet implemented")
-    }
-
-    override fun makeUnderlined() {
-        //TODO("Not yet implemented")
     }
 
     override fun makeCrossedOut() {
@@ -260,7 +279,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun onClick(v: View?) {
-        TODO("Not yet implemented")
+        when(v?.id) {
+            R.id.fab -> { viewer.animateFab() }
+            R.id.bolt -> { viewer.animateFab() }
+            R.id.italic -> { viewer.animateFab() }
+            R.id.underline -> { viewer.animateFab() }
+        }
+        //TODO("Not yet implemented")
     }
 
 

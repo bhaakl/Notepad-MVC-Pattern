@@ -1,10 +1,7 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
-import android.app.Dialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
@@ -13,6 +10,7 @@ import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBindi
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
+    var isOpenFab = false
 
     init {
         controller = Controller(viewer = this)
@@ -31,6 +29,10 @@ class Viewer : AppCompatActivity() {
         }
 
         navigationView.setNavigationItemSelectedListener(controller)
+        fab.setOnClickListener(controller)
+        bolt.setOnClickListener{controller.makeBold()}
+        italic.setOnClickListener{controller.makeItalic()}
+        underline.setOnClickListener{controller.makeUnderlined()}
 
         /*navigationView.setNavigationItemSelectedListener { menuItem ->
             // Handle menu item selected
@@ -39,11 +41,35 @@ class Viewer : AppCompatActivity() {
             true
         }*/
     }
+
     fun close(){
         binding.drawerLayout.close()
     }
 
     fun setText(string: String) {
+    }
+
+    fun animateFab() = with(binding){
+        if (isOpenFab) {
+          fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.rotat_forward))
+          bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
+          italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
+          underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
+          bolt.isClickable = false
+          italic.isClickable = false
+          underline.isClickable = false
+          isOpenFab = false
+        } else {
+            fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.rotat_backforward))
+            bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_open))
+            italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_open))
+            underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_open))
+            bolt.isClickable = true
+            italic.isClickable = true
+            underline.isClickable = true
+            isOpenFab = true
+        }
+
     }
 
 }
