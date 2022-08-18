@@ -16,6 +16,7 @@ import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
+
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
