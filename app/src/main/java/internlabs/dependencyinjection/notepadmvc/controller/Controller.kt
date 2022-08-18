@@ -358,7 +358,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         if (fileName != null) {
             if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
                 val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
-                if (extensionOfFile == "ntp" || extensionOfFile == "kt" || extensionOfFile == "swift" || extensionOfFile == "java") {
+                if (extensionOfFile == "ntp"
+                    || extensionOfFile == "kt"
+                    || extensionOfFile == "swift"
+                    || extensionOfFile == "java") {
                     val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
                     val max = 5629273
                     if (size != null) {
