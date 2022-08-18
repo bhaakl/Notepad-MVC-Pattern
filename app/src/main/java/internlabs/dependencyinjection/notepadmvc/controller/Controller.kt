@@ -15,7 +15,6 @@ import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
-import java.io.*
 
 //-
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
@@ -177,6 +176,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
             false
         }
+    }
+
+    override fun insert() {
+        TODO("Not yet implemented")
     }
 
     override fun delete() {
