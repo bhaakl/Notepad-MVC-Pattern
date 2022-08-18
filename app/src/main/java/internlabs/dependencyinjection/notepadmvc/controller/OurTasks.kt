@@ -7,7 +7,7 @@ interface OurTasks {
     //region start
     fun new()
     fun open()
-    fun save(fileName: String)
+    fun save()
     fun saveAs()
     fun print()
     fun recent()
@@ -15,11 +15,14 @@ interface OurTasks {
     fun sentToEmail()
     fun exit()
 
+
+    // edit
     fun redo()
     fun undo()
     fun cut(textCut: String, startSelection: Int, endSelection: Int)
     fun copy(textCopied: String)
     fun paste(pasteItem: MenuItem): Boolean
+    fun insert()
     fun delete()
     fun find()
     fun replace()
