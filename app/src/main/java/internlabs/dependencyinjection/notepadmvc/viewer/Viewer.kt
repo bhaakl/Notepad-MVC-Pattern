@@ -2,9 +2,11 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 
@@ -35,9 +37,6 @@ class Viewer : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener(controller)
     }
 
-    fun getBinding(): ActivityViewerBinding {
-        return binding
-    }
 
     fun toastCopied() {
         Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
@@ -93,16 +92,20 @@ class Viewer : AppCompatActivity() {
         alertDialog.show()
     }
 
-    fun getText(): String {
-        return binding.editText.text.toString()
+    fun getEditText(): EditText {
+        return binding.editText
+    }
+
+    fun getDrawerLayout(): DrawerLayout {
+        return binding.drawerLayout
+    }
+
+    fun close(){
+        binding.drawerLayout.close()
     }
 
     fun keyBoardShow() {
         // убирает клавиатуру
         binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
-    }
-
-    fun close(){
-        binding.drawerLayout.close()
     }
 }

@@ -44,9 +44,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.showAlertDialog()
             }
             R.id.copy -> {
-                val startSelection: Int = viewer.getBinding().editText.selectionStart
-                val endSelection: Int = viewer.getBinding().editText.selectionEnd
-                val selectedText: String = viewer.getBinding().editText.text.toString()
+                val startSelection: Int = viewer.getEditText().selectionStart
+                val endSelection: Int = viewer.getEditText().selectionEnd
+                val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
                 println("selected text: $selectedText")
                 copy(selectedText)
@@ -55,15 +55,15 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 paste(item)
             }
             R.id.cut -> {
-                val startSelection: Int = viewer.getBinding().editText.selectionStart
-                val endSelection: Int = viewer.getBinding().editText.selectionEnd
-                val selectedText: String = viewer.getBinding().editText.text.toString()
+                val startSelection: Int = viewer.getEditText().selectionStart
+                val endSelection: Int = viewer.getEditText().selectionEnd
+                val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
                 cut(selectedText, startSelection, endSelection)
             }
         }
-        item.isChecked = !item.isChecked;
-        viewer.getBinding().drawerLayout.close()
+        item.isChecked = true;
+        viewer.getDrawerLayout().close()
         return true
     }
 
@@ -129,9 +129,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun cut(textCut: String, startSelection: Int, endSelection: Int) {
         copy(textCut)
-        viewer.getBinding().editText.text =
-            viewer.getBinding().editText.text.replace(startSelection, endSelection, "")
-        viewer.getBinding().editText.setSelection(startSelection)
+        viewer.getEditText().text =
+            viewer.getEditText().text.replace(startSelection, endSelection, "")
+        viewer.getEditText().setSelection(startSelection)
         viewer.toastCut()
     }
 
@@ -142,7 +142,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         // Only show a toast for Android 12 and lower.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
             viewer.toastCopied()
-        viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionEnd)
+        viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
     }
 
     override fun paste(pasteItem: MenuItem): Boolean {
@@ -346,7 +346,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
-        val text = viewer.getText()
+        val text = viewer.getEditText().text.toString()
         try {
             viewer.contentResolver.openFileDescriptor(uri, "rw")?.use {content ->
                 FileOutputStream(content.fileDescriptor).use { fos ->
