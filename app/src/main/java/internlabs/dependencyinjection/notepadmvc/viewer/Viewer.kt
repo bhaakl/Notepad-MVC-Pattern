@@ -12,7 +12,7 @@ import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBindi
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
 import java.util.*
 
-
+// merge
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
