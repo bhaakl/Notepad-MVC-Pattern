@@ -11,12 +11,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
-import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
-
+//-
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
@@ -26,70 +25,45 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         this.viewer = viewer
     }
 
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+        when (item.itemId) {
             R.id.openFile -> {
                 open()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
             R.id.newFile -> {
                 new()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
             R.id.save -> {
                 save()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
             R.id.saveAs -> {
                 saveAs()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
             R.id.about_app -> {
                 viewer.showAlertDialog()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
             R.id.copy -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
-                val startSelection: Int = viewer.getBinding().editText.selectionStart
-                val endSelection: Int = viewer.getBinding().editText.selectionEnd
-                val selectedText: String = viewer.getBinding().editText.text.toString()
+                val startSelection: Int = viewer.getEditText().selectionStart
+                val endSelection: Int = viewer.getEditText().selectionEnd
+                val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
                 println("selected text: $selectedText")
                 copy(selectedText)
-                true
             }
             R.id.paste -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
                 paste(item)
             }
             R.id.cut -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
-                val startSelection: Int = viewer.getBinding().editText.selectionStart
-                val endSelection: Int = viewer.getBinding().editText.selectionEnd
-                val selectedText: String = viewer.getBinding().editText.text.toString()
+                val startSelection: Int = viewer.getEditText().selectionStart
+                val endSelection: Int = viewer.getEditText().selectionEnd
+                val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
                 cut(selectedText, startSelection, endSelection)
-                true
             }
-            else -> {
-                false
-            }
-
         }
+        item.isChecked = true;
+        viewer.getDrawerLayout().close()
+        return true
     }
 
     override fun new() {
@@ -98,7 +72,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
         uri = FileProvider.getUriForFile(viewer,
-            BuildConfig.APPLICATION_ID + ".provider",
+            "internlabs.dependencyinjection.notepadmvc.provider",
             file1)
     }
 
@@ -154,9 +128,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun cut(textCut: String, startSelection: Int, endSelection: Int) {
         copy(textCut)
-        viewer.getBinding().editText.text =
-            viewer.getBinding().editText.text.replace(startSelection, endSelection, "")
-        viewer.getBinding().editText.setSelection(startSelection)
+        viewer.getEditText().text =
+            viewer.getEditText().text.replace(startSelection, endSelection, "")
+        viewer.getEditText().setSelection(startSelection)
         viewer.toastCut()
     }
 
@@ -167,7 +141,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         // Only show a toast for Android 12 and lower.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
             viewer.toastCopied()
-        viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionEnd)
+        viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
     }
 
     override fun paste(pasteItem: MenuItem): Boolean {
@@ -197,7 +171,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         println("PASTED text: $pasteData")
         return if (pasteData.isNotEmpty()) {
             // Если строка содержит данные, то выполняется операция вставки
-            viewer.setText(pasteData)
+            viewer.setTextForEditor(pasteData)
 //            viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionStart)
             viewer.toastPasted()
             true
@@ -371,7 +345,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
-        val text = viewer.getText()
+        val text = viewer.getEditText().text.toString()
         try {
             viewer.contentResolver.openFileDescriptor(uri, "rw")?.use {content ->
                 FileOutputStream(content.fileDescriptor).use { fos ->

@@ -2,9 +2,11 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 
@@ -35,9 +37,6 @@ class Viewer : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener(controller)
     }
 
-    fun getBinding(): ActivityViewerBinding {
-        return binding
-    }
 
     fun toastCopied() {
         Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
@@ -59,7 +58,12 @@ class Viewer : AppCompatActivity() {
         binding.editText.setSelection(binding.editText.text.length)
     }
 
-    fun setText(strAdd: String) {
+    /**
+     * setTextForEditor(): На  вход подается текст, который нужно поместить в ЕдитТекст. Задача этой функции
+     * поместить этот текст: определяется позиция для вставки текста и вставляется
+     * обновляя при этом курсор.
+     */
+    fun setTextForEditor(strAdd: String) {
         if (strAdd.isEmpty()) {
             return
         }
@@ -74,33 +78,39 @@ class Viewer : AppCompatActivity() {
         binding.editText.setSelection(cursor + strAdd.length)
     }
 
-    fun showAlertDialog(){
+    fun showAlertDialog() {
         alertDialog = AlertDialog.Builder(this)
         alertDialog.setTitle("AboutApp")
-            .setMessage("Project developers:Notepad MVC pattern\n" +
-                    "Team: Dependency injection\n" +
-                    "Медербек Шермаматов\n" +
-                    "Умут Арпидинов\n" +
-                    "Атабек Шамшидинов\n" +
-                    "Байыш Бегалиев\n" +
-                    "Мурат Жумалиев")
+            .setMessage(
+                "Project developers:Notepad MVC pattern\n" +
+                        "Team: Dependency injection\n" +
+                        "Медербек Шермаматов\n" +
+                        "Умут Арпидинов\n" +
+                        "Атабек Шамшидинов\n" +
+                        "Байыш Бегалиев\n" +
+                        "Мурат Жумалиев"
+            )
             .setCancelable(true)
-            .setPositiveButton("Ok"){ dialogInterface, _ ->
+            .setPositiveButton("Ok") { dialogInterface, _ ->
                 dialogInterface.cancel()
             }
         alertDialog.show()
     }
 
-    fun getText(): String {
-        return binding.editText.text.toString()
+    fun getEditText(): EditText {
+        return binding.editText
+    }
+
+    fun getDrawerLayout(): DrawerLayout {
+        return binding.drawerLayout
+    }
+
+    fun close(){
+        binding.drawerLayout.close()
     }
 
     fun keyBoardShow() {
         // убирает клавиатуру
         binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
-    }
-
-    fun close(){
-        binding.drawerLayout.close()
     }
 }
