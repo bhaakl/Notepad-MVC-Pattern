@@ -14,7 +14,7 @@ import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBindi
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
-    lateinit var alertDialog: AlertDialog.Builder
+    private lateinit var alertDialog: AlertDialog.Builder
 
     init {
         controller = Controller(viewer = this)
@@ -105,7 +105,7 @@ class Viewer : AppCompatActivity() {
         return binding.drawerLayout
     }
 
-    fun close(){
+    fun close() {
         binding.drawerLayout.close()
     }
 

@@ -15,7 +15,7 @@ import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
-//-
+
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
@@ -61,7 +61,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 cut(selectedText, startSelection, endSelection)
             }
         }
-        item.isChecked = true;
+        item.isChecked = true
         viewer.getDrawerLayout().close()
         return true
     }
@@ -71,9 +71,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
-        uri = FileProvider.getUriForFile(viewer,
+        uri = FileProvider.getUriForFile(
+            viewer,
             "internlabs.dependencyinjection.notepadmvc.provider",
-            file1)
+            file1
+        )
     }
 
     override fun open() {
@@ -88,7 +90,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
                     println(it)
-                    viewer.setTextFromFile(it) }
+                    viewer.setTextFromFile(it)
+                }
                 uri = uri1
             } else {
                 Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
@@ -343,11 +346,12 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
         return false
     }
+
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
         val text = viewer.getEditText().text.toString()
         try {
-            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use {content ->
+            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use { content ->
                 FileOutputStream(content.fileDescriptor).use { fos ->
                     fos.write(text.toByteArray())
                     fos.flush()
@@ -360,11 +364,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             e.printStackTrace()
         }
     }
+
     // -- служебный метод Сохранить как()
-    private val saveAsDoc = viewer.registerForActivityResult(ActivityResultContracts
-        .CreateDocument("application/ntp")){
+    private val saveAsDoc = viewer.registerForActivityResult(
+        ActivityResultContracts
+            .CreateDocument("application/ntp")
+    ) {
         if (it != null) {
-            if (isOk(it)){
+            if (isOk(it)) {
                 saveToFile(it)
                 uri = it
                 viewer.setTextFromFile("")
