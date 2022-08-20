@@ -58,7 +58,12 @@ class Viewer : AppCompatActivity() {
         binding.editText.setSelection(binding.editText.text.length)
     }
 
-    fun setText(strAdd: String) {
+    /**
+     * setTextForEditor(): На  вход подается текст, который нужно поместить в ЕдитТекст. Задача этой функции
+     * поместить этот текст: правильно выбирается позиция для вставки текста и вставляется
+     * обновляя при этом курсор.
+     */
+    fun setTextForEditor(strAdd: String) {
         if (strAdd.isEmpty()) {
             return
         }

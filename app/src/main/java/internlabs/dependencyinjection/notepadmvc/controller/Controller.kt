@@ -172,7 +172,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         println("PASTED text: $pasteData")
         return if (pasteData.isNotEmpty()) {
             // Если строка содержит данные, то выполняется операция вставки
-            viewer.setText(pasteData)
+            viewer.setTextForEditor(pasteData)
 //            viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionStart)
             viewer.toastPasted()
             true
