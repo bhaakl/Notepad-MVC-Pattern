@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
-import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
@@ -73,7 +72,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
         uri = FileProvider.getUriForFile(viewer,
-            BuildConfig.APPLICATION_ID + ".provider",
+            "internlabs.dependencyinjection.notepadmvc.provider",
             file1)
     }
 
