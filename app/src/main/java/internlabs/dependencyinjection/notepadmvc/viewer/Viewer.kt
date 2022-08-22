@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
@@ -83,6 +84,7 @@ class Viewer : AppCompatActivity() {
         binding.editText.setSelection(cursor + strAdd.length)
     }
 
+
     fun getText(): String {
         return binding.editText.text.toString()
     }
@@ -118,6 +120,5 @@ class Viewer : AppCompatActivity() {
     fun close() {
         binding.drawerLayout.close()
     }
-
 
 }

@@ -1,3 +1,5 @@
+
+
 package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.app.Dialog
@@ -14,7 +16,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
-import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,7 +26,6 @@ import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
-import java.text.FieldPosition
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
@@ -36,7 +36,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     init {
         this.viewer = viewer
     }
-
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -99,6 +98,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             else -> {
                 false
             }
+
         }
     }
 
@@ -124,8 +124,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
                     println(it)
-                    viewer.setTextFromFile(it)
-                }
+                    viewer.setTextFromFile(it) }
                 uri = uri1
             } else {
                 Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
@@ -285,7 +284,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun makeBold() {
-       val editText = viewer.getBinding().editText
+        val editText = viewer.getBinding().editText
         val spannableString = SpannableStringBuilder(editText.text)
         spannableString.setSpan(StyleSpan(Typeface.BOLD),
             editText.selectionStart,
