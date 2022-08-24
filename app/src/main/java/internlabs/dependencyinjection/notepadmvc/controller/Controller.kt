@@ -1,5 +1,3 @@
-
-
 package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.app.Dialog
@@ -29,6 +27,8 @@ import java.io.*
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
+
+
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
     private lateinit var dialog: Dialog
@@ -38,68 +38,52 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+        when (item.itemId) {
             R.id.openFile -> {
                 open()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
+
             R.id.newFile -> {
                 new()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
+
             R.id.save -> {
                 save()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
+
             R.id.saveAs -> {
                 saveAs()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
+
             R.id.about_app -> {
                 aboutApp()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
+
             R.id.copy -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
-                val startSelection: Int = viewer.getBinding().editText.selectionStart
-                val endSelection: Int = viewer.getBinding().editText.selectionEnd
-                val selectedText: String = viewer.getBinding().editText.text.toString()
+                val startSelection: Int = viewer.getEditText().selectionStart
+                val endSelection: Int = viewer.getEditText().selectionEnd
+                val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
                 println("selected text: $selectedText")
                 copy(selectedText)
-                true
             }
+
             R.id.paste -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
                 paste(item)
             }
+
             R.id.cut -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
-                val startSelection: Int = viewer.getBinding().editText.selectionStart
-                val endSelection: Int = viewer.getBinding().editText.selectionEnd
-                val selectedText: String = viewer.getBinding().editText.text.toString()
+                val startSelection: Int = viewer.getEditText().selectionStart
+                val endSelection: Int = viewer.getEditText().selectionEnd
+                val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
                 cut(selectedText, startSelection, endSelection)
-                true
-            }
-            else -> {
-                false
             }
 
         }
+        item.isChecked = true
+        viewer.getDrawerLayout().close()
+        return true
     }
 
     override fun new() {
@@ -124,7 +108,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
                     println(it)
-                    viewer.setTextFromFile(it) }
+                    viewer.setTextFromFile(it)
+                }
                 uri = uri1
             } else {
                 Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
@@ -164,9 +149,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun cut(textCut: String, startSelection: Int, endSelection: Int) {
         copy(textCut)
-        viewer.getBinding().editText.text =
-            viewer.getBinding().editText.text.replace(startSelection, endSelection, "")
-        viewer.getBinding().editText.setSelection(startSelection)
+        viewer.getEditText().text =
+            viewer.getEditText().text.replace(startSelection, endSelection, "")
+        viewer.getEditText().setSelection(startSelection)
         viewer.toastCut()
     }
 
@@ -177,7 +162,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         // Only show a toast for Android 12 and lower.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
             viewer.toastCopied()
-        viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionEnd)
+        viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
     }
 
     override fun paste(pasteItem: MenuItem): Boolean {
@@ -257,7 +242,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun size() {
 
-        val editText = viewer.getBinding().editText
+        val editText = viewer.getEditText()
         val spinner = viewer.findViewById<Spinner>(R.id.spinner)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -284,7 +269,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun makeBold() {
-        val editText = viewer.getBinding().editText
+        val editText = viewer.getEditText()
         val spannableString = SpannableStringBuilder(editText.text)
         spannableString.setSpan(StyleSpan(Typeface.BOLD),
             editText.selectionStart,
@@ -294,7 +279,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun makeItalic() {
-        val editText = viewer.getBinding().editText
+        val editText = viewer.getEditText()
         val spannableString = SpannableStringBuilder(editText.text)
         spannableString.setSpan(StyleSpan(Typeface.ITALIC),
             editText.selectionStart,
@@ -303,12 +288,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         editText.text = spannableString
     }
 
-    override fun makeCursive() {
-        TODO("Not yet implemented")
-    }
-
     override fun makeUnderlined() {
-        val editText = viewer.getBinding().editText
+        val editText = viewer.getEditText()
         val spannableString = SpannableStringBuilder(editText.text)
         spannableString.setSpan(UnderlineSpan(), editText.selectionStart, editText.selectionEnd, 0)
         editText.text = spannableString
@@ -334,16 +315,29 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         TODO("Not yet implemented")
     }
 
-    override fun alignLeft() {
+    override fun makeCursive() {
         TODO("Not yet implemented")
+    }
+
+    override fun alignLeft() {
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
     override fun alignRight() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_END
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
-    override fun alignLeftAndLeft() {
-        TODO("Not yet implemented")
+    override fun alignCenter() {
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
     override fun lineSpace() {
@@ -395,18 +389,41 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             R.id.editText -> {
                 viewer.keyBoardShow()
             }
+
             R.id.fab -> {
                 viewer.animateFab()
             }
+
             R.id.bolt -> {
                 viewer.animateFab()
+                makeBold()
             }
+
             R.id.italic -> {
                 viewer.animateFab()
+                makeItalic()
             }
+
             R.id.underline -> {
                 viewer.animateFab()
+                makeUnderlined()
             }
+
+            R.id.align_left -> {
+                viewer.animateFab()
+                alignLeft()
+            }
+
+            R.id.align_right -> {
+                viewer.animateFab()
+                alignRight()
+            }
+
+            R.id.align_center -> {
+                viewer.animateFab()
+                alignCenter()
+            }
+
         }
     }
 
@@ -435,7 +452,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
-        val text = viewer.getText()
+        val text = viewer.getEditText().toString()
         try {
             viewer.contentResolver.openFileDescriptor(uri, "rw")?.use { content ->
                 FileOutputStream(content.fileDescriptor).use { fos ->
@@ -445,7 +462,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
             }
         } catch (e: FileNotFoundException) {
-            println("нетуу")
+            Toast.makeText(viewer, "File not found!", Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -460,8 +477,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 uri = it
                 viewer.setTextFromFile("")
             } else {
-
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+                Toast.makeText(viewer, "File extension is not supported!", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
