@@ -9,12 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
+import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
+import java.util.*
 
 
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
     private lateinit var alertDialog: AlertDialog.Builder
+
+    private lateinit var undoRedoManager: TextUndoRedo
 
     init {
         controller = Controller(viewer = this)
@@ -31,12 +35,14 @@ class Viewer : AppCompatActivity() {
     private fun initListeners() = with(binding) {
         imageMenu.setNavigationOnClickListener {
             drawerLayout.open()
-            binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+            editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
         }
 
         navigationView.setNavigationItemSelectedListener(controller)
-    }
 
+        undoRedoManager = TextUndoRedo(binding.editText)
+        undoRedoManager.setMaxHistorySize(1000)
+    }
 
     fun toastCopied() {
         Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
@@ -97,6 +103,10 @@ class Viewer : AppCompatActivity() {
         alertDialog.show()
     }
 
+    fun getUndoRedoManager(): TextUndoRedo {
+        return undoRedoManager
+    }
+
     fun getEditText(): EditText {
         return binding.editText
     }
@@ -105,12 +115,20 @@ class Viewer : AppCompatActivity() {
         return binding.drawerLayout
     }
 
-    fun close() {
+    private fun close() {
         binding.drawerLayout.close()
     }
 
     fun keyBoardShow() {
         // убирает клавиатуру
         binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        undoRedoManager.clearHistory()
+        undoRedoManager.disconnect()
+        close()
     }
 }

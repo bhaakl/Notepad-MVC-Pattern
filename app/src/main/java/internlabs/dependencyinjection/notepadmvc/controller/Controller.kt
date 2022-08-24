@@ -18,6 +18,7 @@ import java.io.*
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
+
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
 
@@ -29,15 +30,19 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         when (item.itemId) {
             R.id.openFile -> {
                 open()
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.newFile -> {
                 new()
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.save -> {
                 save()
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.saveAs -> {
                 saveAs()
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.about_app -> {
                 viewer.showAlertDialog()
@@ -59,6 +64,12 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
                 cut(selectedText, startSelection, endSelection)
+            }
+            R.id.undo -> {
+                undo()
+            }
+            R.id.redo -> {
+                redo()
             }
         }
         item.isChecked = true
@@ -86,7 +97,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     { uri1 ->
         if (uri1 != null) {
             if (isOk(uri1)) {
-                println("......................")
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
                     println(it)
@@ -94,7 +104,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
                 uri = uri1
             } else {
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+                Toast.makeText(viewer, "File extension is not supported", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -122,11 +132,17 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun redo() {
-        TODO("Not yet implemented")
+        val manager = viewer.getUndoRedoManager()
+        if(manager.canRedo) {
+            manager.redo()
+        }
     }
 
     override fun undo() {
-        TODO("Not yet implemented")
+        val manager = viewer.getUndoRedoManager()
+        if(manager.canUndo) {
+            manager.undo()
+        }
     }
 
     override fun cut(textCut: String, startSelection: Int, endSelection: Int) {
@@ -292,6 +308,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun save() {
         saveToFile(uri)
+        Toast.makeText(viewer, "File has been saved!", Toast.LENGTH_SHORT).show()
+
     }
 
     override fun saveAs() {
@@ -335,7 +353,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         if (fileName != null) {
             if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
                 val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
-                if (extensionOfFile == "ntp" || extensionOfFile == "kt" || extensionOfFile == "swift" || extensionOfFile == "java") {
+                if (extensionOfFile == "ntp"
+                    || extensionOfFile == "kt"
+                    || extensionOfFile == "swift"
+                    || extensionOfFile == "java") {
                     val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
                     val max = 5629273
                     if (size != null) {
@@ -359,7 +380,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
             }
         } catch (e: FileNotFoundException) {
-            println("нетуу")
+            Toast.makeText(viewer, "File not found!", Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -377,7 +398,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.setTextFromFile("")
             } else {
 
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+                Toast.makeText(viewer, "File extension is not supported!", Toast.LENGTH_SHORT).show()
             }
         }
 

@@ -17,7 +17,7 @@
             style="@style/Widget.MaterialComponents.AppBarLayout.PrimarySurface"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="true">
+            android:fitsSystemWindows="true" >
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/imageMenu"
