@@ -1,17 +1,15 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
-import android.view.Menu
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
-import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
+import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
 import java.util.*
 
 

@@ -138,15 +138,7 @@ class TextUndoRedo(private val myTextView: TextView) {
         var tStart: Int,
         var tBefore: CharSequence?,
         var tAfter: CharSequence?
-    ) {
-        override fun toString(): String {
-            return "EditItem{" +
-                    "tStart=" + tStart +
-                    ", tBefore=" + tBefore +
-                    ", tAfter=" + tAfter +
-                    '}'
-        }
-    }
+    )
 
     internal enum class ActionType {
         INSERT, DELETE, PASTE, NOT_DEF

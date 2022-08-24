@@ -97,7 +97,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     { uri1 ->
         if (uri1 != null) {
             if (isOk(uri1)) {
-                println("......................")
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
                     println(it)
@@ -105,7 +104,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
                 uri = uri1
             } else {
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG).show()
+                Toast.makeText(viewer, "File extension is not supported", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -309,6 +308,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun save() {
         saveToFile(uri)
+        Toast.makeText(viewer, "File has been saved!", Toast.LENGTH_SHORT).show()
+
     }
 
     override fun saveAs() {
@@ -379,7 +380,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
             }
         } catch (e: FileNotFoundException) {
-            println("нетуу")
+            Toast.makeText(viewer, "File not found!", Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -397,7 +398,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.setTextFromFile("")
             } else {
 
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG).show()
+                Toast.makeText(viewer, "File extension is not supported!", Toast.LENGTH_SHORT).show()
             }
         }
 
