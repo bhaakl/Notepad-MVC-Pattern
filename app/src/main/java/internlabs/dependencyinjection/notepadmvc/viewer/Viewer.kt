@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
+import internlabs.dependencyinjection.notepadmvc.printDocument.PrintDocument
 
 
 class Viewer : AppCompatActivity() {
@@ -25,8 +26,11 @@ class Viewer : AppCompatActivity() {
         binding = ActivityViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         initListeners()
     }
+
+
 
     private fun initListeners() = with(binding) {
         imageMenu.setNavigationOnClickListener {

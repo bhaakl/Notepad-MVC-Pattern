@@ -12,6 +12,7 @@ import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
+import internlabs.dependencyinjection.notepadmvc.printDocument.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
@@ -59,6 +60,19 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
                 cut(selectedText, startSelection, endSelection)
+            }
+            R.id.printDocument ->{
+                val content : String = viewer.getEditText().text.toString()
+                if(content != ""){
+
+                    val printDocument = PrintDocument(content,viewer)
+                    printDocument.doPrint()
+                }
+                else {
+                    Toast.makeText(viewer,"Документ пустой!",Toast.LENGTH_LONG).show()
+
+                }
+
             }
         }
         item.isChecked = true
