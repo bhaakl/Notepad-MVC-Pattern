@@ -1,6 +1,6 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
-import android.content.Context
+import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -8,18 +8,19 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
-import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.InputStream
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
+
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
 
@@ -27,43 +28,71 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         this.viewer = viewer
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.openFile -> {
                 open()
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.newFile -> {
                 new()
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.save -> {
                 save()
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.saveAs -> {
                 saveAs()
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.about_app -> {
                 viewer.showAlertDialog()
             }
-
+            R.id.copy -> {
+                val startSelection: Int = viewer.getEditText().selectionStart
+                val endSelection: Int = viewer.getEditText().selectionEnd
+                val selectedText: String = viewer.getEditText().text.toString()
+                    .substring(startSelection, endSelection)
+                println("selected text: $selectedText")
+                copy(selectedText)
+            }
+            R.id.paste -> {
+                paste(item)
+            }
+            R.id.cut -> {
+                val startSelection: Int = viewer.getEditText().selectionStart
+                val endSelection: Int = viewer.getEditText().selectionEnd
+                val selectedText: String = viewer.getEditText().text.toString()
+                    .substring(startSelection, endSelection)
+                cut(selectedText, startSelection, endSelection)
+            }
+            R.id.undo -> {
+                undo()
+            }
+            R.id.redo -> {
+                redo()
+            }
         }
-        viewer.close()
-        item.isChecked = !item.isChecked
+        item.isChecked = true
+        viewer.getDrawerLayout().close()
         return true
     }
 
     override fun new() {
-        viewer.setText("")
+        viewer.setTextFromFile("")
         val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
-        uri = FileProvider.getUriForFile(viewer,
-            BuildConfig.APPLICATION_ID + ".provider",
-            file1)
+        uri = FileProvider.getUriForFile(
+            viewer,
+            "internlabs.dependencyinjection.notepadmvc.provider",
+            file1
+        )
     }
 
     override fun open() {
-        openDoc.launch(arrayOf("*/*"));
+        openDoc.launch(arrayOf("*/*"))
     }
 
     private val openDoc = viewer.registerForActivityResult(ActivityResultContracts.OpenDocument())
@@ -71,11 +100,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         if (uri1 != null) {
             if (isOk(uri1)) {
                 val byteData = getText(viewer, uri1)
-                println("byteData    ${byteData?.let { String(it) }}")
-                byteData?.let { String(it) }?.let { viewer.setText(it) }
+                byteData?.let { String(it) }?.let {
+                    println(it)
+                    viewer.setTextFromFile(it)
+                }
                 uri = uri1
             } else {
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+                Toast.makeText(viewer, "File extension is not supported", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -102,8 +133,185 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
+    override fun redo() {
+        val manager = viewer.getUndoRedoManager()
+        if(manager.canRedo) {
+            manager.redo()
+        }
+    }
+
+    override fun undo() {
+        val manager = viewer.getUndoRedoManager()
+        if(manager.canUndo) {
+            manager.undo()
+        }
+    }
+
+    override fun cut(textCut: String, startSelection: Int, endSelection: Int) {
+        copy(textCut)
+        viewer.getEditText().text =
+            viewer.getEditText().text.replace(startSelection, endSelection, "")
+        viewer.getEditText().setSelection(startSelection)
+        viewer.toastCut()
+    }
+
+    override fun copy(textCopied: String) {
+        val clipboardManager =
+            viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("", textCopied))
+        // Only show a toast for Android 12 and lower.
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+            viewer.toastCopied()
+        viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
+    }
+
+    override fun paste(pasteItem: MenuItem): Boolean {
+        val clipboard =
+            viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        var pasteData: String = ""
+
+        // Если в буфере обмена нет данных, отключаем пункт меню вставки.
+        // Если он содержит данные, решите, можете ли вы обрабатывать данные.
+        pasteItem.isEnabled = when {
+            !clipboard.hasPrimaryClip() -> {
+                false
+            }
+            !(clipboard.primaryClipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN))!! -> {
+                // Это отключает пункт меню вставки, так как в буфере обмена есть данные, но это не обычный текст
+                false
+            }
+            else -> {
+                // Это включает пункт меню вставки, так как буфер обмена содержит обычный текст.
+                true
+            }
+        }
+        val item = clipboard.primaryClip?.getItemAt(0)
+
+        // Gets the clipboard as text.
+        pasteData = item?.text.toString()
+        println("PASTED text: $pasteData")
+        return if (pasteData.isNotEmpty()) {
+            // Если строка содержит данные, то выполняется операция вставки
+            viewer.setTextForEditor(pasteData)
+//            viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionStart)
+            viewer.toastPasted()
+            true
+        } else {
+            // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
+            // содержат текст. Сообщить об ошибке.
+            Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
+            false
+        }
+    }
+
+    override fun insert() {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete() {
+        TODO("Not yet implemented")
+    }
+
+    override fun find() {
+        TODO("Not yet implemented")
+    }
+
+    override fun replace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun selectAll() {
+        TODO("Not yet implemented")
+    }
+
+    override fun dateAndTime() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomIn() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomOut() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomDefault() {
+        TODO("Not yet implemented")
+    }
+
+    override fun size() {
+        TODO("Not yet implemented")
+    }
+
+    override fun fontFamily() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeBold() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeItalic() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeCursive() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeUnderlined() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeCrossedOut() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeSubscript() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeSuperscript() {
+        TODO("Not yet implemented")
+    }
+
+    override fun textColor() {
+        TODO("Not yet implemented")
+    }
+
+    override fun textBackground() {
+        TODO("Not yet implemented")
+    }
+
+    override fun alignLeft() {
+        TODO("Not yet implemented")
+    }
+
+    override fun alignRight() {
+        TODO("Not yet implemented")
+    }
+
+    override fun alignLeftAndLeft() {
+        TODO("Not yet implemented")
+    }
+
+    override fun lineSpace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun letterSpace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun changeTheme() {
+        TODO("Not yet implemented")
+    }
+
     override fun save() {
         saveToFile(uri)
+        Toast.makeText(viewer, "File has been saved!", Toast.LENGTH_SHORT).show()
+
     }
 
     override fun saveAs() {
@@ -112,152 +320,33 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun print() {
-      //  TODO("Not yet implemented")
+        //  TODO("Not yet implemented")
     }
 
     override fun recent() {
-        //TODO("Not yet implemented")
+        TODO("Not yet implemented")
     }
 
     override fun aboutApp() {
-        //TODO("Not yet implemented")
+        TODO("Not yet implemented")
     }
 
     override fun sentToEmail() {
-        //TODO("Not yet implemented")
+        TODO("Not yet implemented")
     }
 
     override fun exit() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun redo() {
-      //  TODO("Not yet implemented")
-    }
-
-    override fun undo() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun cut() {
-       // TODO("Not yet implemented")
-    }
-
-    override fun copy() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun insert() {
-       // TODO("Not yet implemented")
-    }
-
-    override fun delete() {
-       // TODO("Not yet implemented")
-    }
-
-    override fun find() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun replace() {
-      //  TODO("Not yet implemented")
-    }
-
-    override fun selectAll() {
-       // TODO("Not yet implemented")
-    }
-
-    override fun dateAndTime() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun zoomIn() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun zoomOut() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun zoomDefault() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun size() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun fontFamily() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun makeBold() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun makeItalic() {
-    //    TODO("Not yet implemented")
-    }
-
-    override fun makeCursive() {
-      //  TODO("Not yet implemented")
-    }
-
-    override fun makeUnderlined() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun makeCrossedOut() {
-    //    TODO("Not yet implemented")
-    }
-
-    override fun makeSubscript() {
-      //  TODO("Not yet implemented")
-    }
-
-    override fun makeSuperscript() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun textColor() {
-    //    TODO("Not yet implemented")
-    }
-
-    override fun textBackground() {
-      //  TODO("Not yet implemented")
-    }
-
-    override fun alignLeft() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun alignRight() {
-    //    TODO("Not yet implemented")
-    }
-
-    override fun alignLeftAndLeft() {
-      //  TODO("Not yet implemented")
-    }
-
-    override fun lineSpace() {
-        //TODO("Not yet implemented")
-    }
-
-    override fun letterSpace() {
-    //    TODO("Not yet implemented")
-    }
-
-    override fun changeTheme() {
-      //  TODO("Not yet implemented")
+        TODO("Not yet implemented")
     }
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.et_main_field -> {
+            R.id.editText -> {
                 viewer.keyBoardShow()
             }
         }
     }
+
 
     //region  Медер Шермаматов
     //-- служебный метод Фильтр для файлов()
@@ -266,7 +355,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         if (fileName != null) {
             if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
                 val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
-                if (extensionOfFile == "ntp" || extensionOfFile == "kt" || extensionOfFile == "swift" || extensionOfFile == "java") {
+                if (extensionOfFile == "ntp"
+                    || extensionOfFile == "kt"
+                    || extensionOfFile == "swift"
+                    || extensionOfFile == "java") {
                     val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
                     val max = 5629273
                     if (size != null) {
@@ -277,11 +369,12 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
         return false
     }
+
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
-        val text = viewer.getText()
+        val text = viewer.getEditText().text.toString()
         try {
-            viewer.contentResolver.openFileDescriptor(uri, "drwx")?.use {content ->
+            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use { content ->
                 FileOutputStream(content.fileDescriptor).use { fos ->
                     fos.write(text.toByteArray())
                     fos.flush()
@@ -289,21 +382,25 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
             }
         } catch (e: FileNotFoundException) {
-            println("нетуу")
+            Toast.makeText(viewer, "File not found!", Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
+
     // -- служебный метод Сохранить как()
-    private val saveAsDoc = viewer.registerForActivityResult(ActivityResultContracts
-        .CreateDocument("application/ntp")){
+    private val saveAsDoc = viewer.registerForActivityResult(
+        ActivityResultContracts
+            .CreateDocument("application/ntp")
+    ) {
         if (it != null) {
-            if (isOk(it)){
+            if (isOk(it)) {
                 saveToFile(it)
                 uri = it
-                viewer.setText("")
+                viewer.setTextFromFile("")
             } else {
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+
+                Toast.makeText(viewer, "File extension is not supported!", Toast.LENGTH_SHORT).show()
             }
         }
 

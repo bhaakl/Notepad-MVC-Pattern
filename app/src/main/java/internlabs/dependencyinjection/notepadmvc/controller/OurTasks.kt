@@ -1,5 +1,7 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
+import android.view.MenuItem
+
 interface OurTasks {
 
     //region start
@@ -13,11 +15,13 @@ interface OurTasks {
     fun sentToEmail()
     fun exit()
 
+
     // edit
     fun redo()
     fun undo()
-    fun cut()
-    fun copy()
+    fun cut(textCut: String, startSelection: Int, endSelection: Int)
+    fun copy(textCopied: String)
+    fun paste(pasteItem: MenuItem): Boolean
     fun insert()
     fun delete()
     fun find()
