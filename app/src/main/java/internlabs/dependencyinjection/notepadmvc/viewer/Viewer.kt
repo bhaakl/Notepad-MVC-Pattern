@@ -2,17 +2,23 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
+import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
+import java.util.*
 
 
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
-    lateinit var alertDialog: AlertDialog.Builder
+    private lateinit var alertDialog: AlertDialog.Builder
+
+    private lateinit var undoRedoManager: TextUndoRedo
 
     init {
         controller = Controller(viewer = this)
@@ -22,24 +28,22 @@ class Viewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         initListeners()
     }
 
     private fun initListeners() = with(binding) {
         imageMenu.setNavigationOnClickListener {
             drawerLayout.open()
-            binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+            editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
         }
 
         navigationView.setNavigationItemSelectedListener(controller)
+
+        undoRedoManager = TextUndoRedo(binding.editText)
+        undoRedoManager.setMaxHistorySize(1000)
     }
 
-    fun getBinding(): ActivityViewerBinding {
-        return binding
-    }
-
-    fun toastCopied() {
+   /* fun toastCopied() {
         Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
     }
 
@@ -49,7 +53,7 @@ class Viewer : AppCompatActivity() {
 
     fun toastCut() {
         Toast.makeText(this, "Cut Out", Toast.LENGTH_SHORT).show()
-    }
+    }*/
 
     /**
      * @param setSelection  переносит курсор в конец строки у edit text
@@ -59,8 +63,14 @@ class Viewer : AppCompatActivity() {
         binding.editText.setSelection(binding.editText.text.length)
     }
 
-    fun setText(strAdd: String) {
-        if (strAdd.isEmpty()) {
+    /**
+     * setTextForEditor(): На  вход подается текст, который нужно поместить в ЕдитТекст. Задача этой функции
+     * поместить этот текст: определяется позиция для вставки текста и вставляется
+     * обновляя при этом курсор.
+     */
+    fun setTextForEditor(strAdd: String) {
+        if (strAdd.isEmpty() || !binding.editText.isEnabled) { // нельзя выставить пока документ не создан
+            showToast("нельзя выставить текст пока документ не создан")
             return
         }
         val old = binding.editText.text.toString()
@@ -72,27 +82,42 @@ class Viewer : AppCompatActivity() {
         else
             binding.editText.setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
         binding.editText.setSelection(cursor + strAdd.length)
+        showToast("Pasted")
     }
 
-    fun showAlertDialog(){
+    fun showAlertDialog() {
         alertDialog = AlertDialog.Builder(this)
         alertDialog.setTitle("AboutApp")
-            .setMessage("Project developers:Notepad MVC pattern\n" +
-                    "Team: Dependency injection\n" +
-                    "Медербек Шермаматов\n" +
-                    "Умут Арпидинов\n" +
-                    "Атабек Шамшидинов\n" +
-                    "Байыш Бегалиев\n" +
-                    "Мурат Жумалиев")
+            .setMessage(
+                "Project developers:Notepad MVC pattern\n" +
+                        "Team: Dependency injection\n" +
+                        "Медербек Шермаматов\n" +
+                        "Умут Арпидинов\n" +
+                        "Атабек Шамшидинов\n" +
+                        "Байыш Бегалиев\n" +
+                        "Мурат Жумалиев"
+            )
             .setCancelable(true)
-            .setPositiveButton("Ok"){ dialogInterface, _ ->
+            .setPositiveButton("Ok") { dialogInterface, _ ->
                 dialogInterface.cancel()
             }
         alertDialog.show()
     }
 
-    fun getText(): String {
-        return binding.editText.text.toString()
+    fun getUndoRedoManager(): TextUndoRedo {
+        return undoRedoManager
+    }
+
+    fun getEditText(): EditText {
+        return binding.editText
+    }
+
+    fun getDrawerLayout(): DrawerLayout {
+        return binding.drawerLayout
+    }
+
+    private fun close() {
+        binding.drawerLayout.close()
     }
 
     fun keyBoardShow() {
@@ -100,7 +125,20 @@ class Viewer : AppCompatActivity() {
         binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
     }
 
-    fun close(){
-        binding.drawerLayout.close()
+    override fun onDestroy() {
+        super.onDestroy()
+
+        undoRedoManager.clearHistory()
+        undoRedoManager.disconnect()
+        close()
+    }
+
+    fun makeEditTextEditable() {
+        binding.editText.isEnabled = true
+        binding.editText.isFocusable = true
+    }
+
+    fun showToast(s: String) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
     }
 }

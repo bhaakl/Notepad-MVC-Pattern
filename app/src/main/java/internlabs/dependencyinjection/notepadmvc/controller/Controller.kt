@@ -6,19 +6,19 @@ import android.os.Build
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
-import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
+import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
+
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
 
@@ -26,80 +26,62 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         this.viewer = viewer
     }
 
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+        when (item.itemId) {
             R.id.openFile -> {
                 open()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.newFile -> {
                 new()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.save -> {
                 save()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.saveAs -> {
                 saveAs()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
+                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.about_app -> {
                 viewer.showAlertDialog()
-                viewer.close()
-                item.isChecked = !item.isChecked
-                true
             }
             R.id.copy -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
-                val startSelection: Int = viewer.getBinding().editText.selectionStart
-                val endSelection: Int = viewer.getBinding().editText.selectionEnd
-                val selectedText: String = viewer.getBinding().editText.text.toString()
-                    .substring(startSelection, endSelection)
-                println("selected text: $selectedText")
-                copy(selectedText)
-                true
+                copy("")
             }
             R.id.paste -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
                 paste(item)
             }
             R.id.cut -> {
-                item.isChecked = !item.isChecked
-                viewer.getBinding().drawerLayout.close()
-                val startSelection: Int = viewer.getBinding().editText.selectionStart
-                val endSelection: Int = viewer.getBinding().editText.selectionEnd
-                val selectedText: String = viewer.getBinding().editText.text.toString()
-                    .substring(startSelection, endSelection)
-                cut(selectedText, startSelection, endSelection)
-                true
+                cut()
             }
-            else -> {
-                false
+            R.id.printDocument ->{
+                print()
             }
-
+            R.id.undo -> {
+                undo()
+            }
+            R.id.redo -> {
+                redo()
+            }
         }
+        item.isChecked = true
+        viewer.getDrawerLayout().close()
+        return true
     }
 
     override fun new() {
+        viewer.makeEditTextEditable()
         viewer.setTextFromFile("")
         val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
-        uri = FileProvider.getUriForFile(viewer,
-            BuildConfig.APPLICATION_ID + ".provider",
-            file1)
+        uri = FileProvider.getUriForFile(
+            viewer,
+            "internlabs.dependencyinjection.notepadmvc.provider",
+            file1
+        )
     }
 
     override fun open() {
@@ -110,14 +92,15 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     { uri1 ->
         if (uri1 != null) {
             if (isOk(uri1)) {
-                println("......................")
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
                     println(it)
-                    viewer.setTextFromFile(it) }
+                    viewer.setTextFromFile(it)
+                }
                 uri = uri1
+                viewer.makeEditTextEditable()
             } else {
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+                viewer.showToast("Файл не поддерживается!")
             }
         }
     }
@@ -139,35 +122,54 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             outputStream.toByteArray() // TODO Stream нельзя использовать
         } catch (ex: Exception) {
             Log.e("Error", ex.message.toString())
-            Toast.makeText(context, "getText error:" + ex.message, Toast.LENGTH_LONG).show()
+            viewer.showToast("getText error: ${ex.message}")
             null
         }
     }
 
     override fun redo() {
-        TODO("Not yet implemented")
+        val manager = viewer.getUndoRedoManager()
+        if(manager.canRedo) {
+            manager.redo()
+        }
     }
 
     override fun undo() {
-        TODO("Not yet implemented")
+        val manager = viewer.getUndoRedoManager()
+        if(manager.canUndo) {
+            manager.undo()
+        }
     }
 
-    override fun cut(textCut: String, startSelection: Int, endSelection: Int) {
-        copy(textCut)
-        viewer.getBinding().editText.text =
-            viewer.getBinding().editText.text.replace(startSelection, endSelection, "")
-        viewer.getBinding().editText.setSelection(startSelection)
-        viewer.toastCut()
+    override fun cut() {
+        val startSelection: Int = viewer.getEditText().selectionStart
+        val endSelection: Int = viewer.getEditText().selectionEnd
+        val selectedText: String = viewer.getEditText().text.toString()
+            .substring(startSelection, endSelection)
+
+        copy(selectedText)
+        viewer.getEditText().text =
+            viewer.getEditText().text.replace(startSelection, endSelection, "")
+        viewer.getEditText().setSelection(startSelection)
+        //viewer.toastCut()
+        viewer.showToast("Cut Out")
     }
 
     override fun copy(textCopied: String) {
+        val startSelection: Int = viewer.getEditText().selectionStart
+        val endSelection: Int = viewer.getEditText().selectionEnd
+        val cTextCopied: String = viewer.getEditText().text.toString()
+        .substring(startSelection, endSelection)
+
+        println("selected text: $cTextCopied")
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("", textCopied))
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("", cTextCopied))
         // Only show a toast for Android 12 and lower.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-            viewer.toastCopied()
-        viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionEnd)
+            //viewer.toastCopied()
+            viewer.showToast("Copied")
+        viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
     }
 
     override fun paste(pasteItem: MenuItem): Boolean {
@@ -197,9 +199,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         println("PASTED text: $pasteData")
         return if (pasteData.isNotEmpty()) {
             // Если строка содержит данные, то выполняется операция вставки
-            viewer.setText(pasteData)
-//            viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionStart)
-            viewer.toastPasted()
+            viewer.setTextForEditor(pasteData)
+            //viewer.toastPasted()
+            //viewer.showToast("Pasted")
             true
         } else {
             // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
@@ -207,10 +209,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
             false
         }
-    }
-
-    override fun insert() {
-        TODO("Not yet implemented")
     }
 
     override fun delete() {
@@ -315,6 +313,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun save() {
         saveToFile(uri)
+        viewer.showToast("File has been saved!")
     }
 
     override fun saveAs() {
@@ -323,7 +322,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun print() {
-        //  TODO("Not yet implemented")
+        val content : String = viewer.getEditText().text.toString()
+        if(content != ""){
+            val printDocument = PrintDocument(content,viewer)
+            printDocument.doPrint()
+        }
+        else {
+            viewer.showToast("Документ пустой!")
+        }
     }
 
     override fun recent() {
@@ -374,9 +380,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
-        val text = viewer.getText()
+        val text = viewer.getEditText().text.toString()
         try {
-            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use {content ->
+            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use { content ->
                 FileOutputStream(content.fileDescriptor).use { fos ->
                     fos.write(text.toByteArray())
                     fos.flush()
@@ -390,19 +396,19 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
     // -- служебный метод Сохранить как()
-    private val saveAsDoc = viewer.registerForActivityResult(ActivityResultContracts
-        .CreateDocument("application/ntp")){
+    private val saveAsDoc = viewer.registerForActivityResult(
+        ActivityResultContracts
+            .CreateDocument("application/ntp")
+    ) {
         if (it != null) {
             if (isOk(it)){
                 saveToFile(it)
                 uri = it
                 viewer.setTextFromFile("")
             } else {
-
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+                viewer.showToast("File extension is not supported!")
             }
         }
-
     }
     //endregion
 }
