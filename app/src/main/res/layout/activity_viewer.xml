@@ -43,6 +43,7 @@
                 android:autofillHints="false"
                 android:background="@color/white"
                 android:gravity="top|left"
+                android:enabled="false"
                 android:inputType="textMultiLine"
                 android:maxLength="6000000"
                 tools:ignore="LabelFor,RtlHardcoded" />

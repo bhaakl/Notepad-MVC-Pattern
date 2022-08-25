@@ -20,12 +20,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
 
     private var viewer: Viewer
-    private var context: Context
     private var uri: Uri = Uri.parse("")
 
     init {
         this.viewer = viewer
-        context = viewer
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -108,7 +106,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 uri = uri1
                 viewer.makeEditTextEditable()
             } else {
-                Toast.makeText(context, "Файл не поддерживается!", Toast.LENGTH_LONG)
+                viewer.showToast("Файл не поддерживается!")
             }
         }
     }
@@ -130,7 +128,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             outputStream.toByteArray() // TODO Stream нельзя использовать
         } catch (ex: Exception) {
             Log.e("Error", ex.message.toString())
-            Toast.makeText(context, "getText error:" + ex.message, Toast.LENGTH_LONG).show()
+            viewer.showToast("getText error: ${ex.message}")
             null
         }
     }
@@ -154,7 +152,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         viewer.getEditText().text =
             viewer.getEditText().text.replace(startSelection, endSelection, "")
         viewer.getEditText().setSelection(startSelection)
-        viewer.toastCut()
+        //viewer.toastCut()
+        viewer.showToast("Cut Out")
     }
 
     override fun copy(textCopied: String) {
@@ -163,7 +162,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         clipboardManager.setPrimaryClip(ClipData.newPlainText("", textCopied))
         // Only show a toast for Android 12 and lower.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-            viewer.toastCopied()
+            //viewer.toastCopied()
+            viewer.showToast("Copied")
         viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
     }
 
@@ -195,7 +195,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         return if (pasteData.isNotEmpty()) {
             // Если строка содержит данные, то выполняется операция вставки
             viewer.setTextForEditor(pasteData)
-            viewer.toastPasted()
+            //viewer.toastPasted()
+            //viewer.showToast("Pasted")
             true
         } else {
             // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
@@ -311,8 +312,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun save() {
         saveToFile(uri)
-        Toast.makeText(viewer, "File has been saved!", Toast.LENGTH_SHORT).show()
-
+        viewer.showToast("File has been saved!")
     }
 
     override fun saveAs() {
@@ -398,11 +398,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 uri = it
                 viewer.setTextFromFile("")
             } else {
-
-                Toast.makeText(viewer, "File extension is not supported!", Toast.LENGTH_SHORT).show()
+                viewer.showToast("File extension is not supported!")
             }
         }
-
     }
     //endregion
 }

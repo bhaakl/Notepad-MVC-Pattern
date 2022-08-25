@@ -43,7 +43,7 @@ class Viewer : AppCompatActivity() {
         undoRedoManager.setMaxHistorySize(1000)
     }
 
-    fun toastCopied() {
+   /* fun toastCopied() {
         Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
     }
 
@@ -53,7 +53,7 @@ class Viewer : AppCompatActivity() {
 
     fun toastCut() {
         Toast.makeText(this, "Cut Out", Toast.LENGTH_SHORT).show()
-    }
+    }*/
 
     /**
      * @param setSelection  переносит курсор в конец строки у edit text
@@ -69,7 +69,8 @@ class Viewer : AppCompatActivity() {
      * обновляя при этом курсор.
      */
     fun setTextForEditor(strAdd: String) {
-        if (strAdd.isEmpty()) {
+        if (strAdd.isEmpty() || !binding.editText.isEnabled) { // нельзя выставить пока документ не создан
+            showToast("нельзя выставить текст пока документ не создан")
             return
         }
         val old = binding.editText.text.toString()
@@ -81,6 +82,7 @@ class Viewer : AppCompatActivity() {
         else
             binding.editText.setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
         binding.editText.setSelection(cursor + strAdd.length)
+        showToast("Pasted")
     }
 
     fun showAlertDialog() {
@@ -134,5 +136,9 @@ class Viewer : AppCompatActivity() {
     fun makeEditTextEditable() {
         binding.editText.isEnabled = true
         binding.editText.isFocusable = true
+    }
+
+    fun showToast(s: String) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
     }
 }
