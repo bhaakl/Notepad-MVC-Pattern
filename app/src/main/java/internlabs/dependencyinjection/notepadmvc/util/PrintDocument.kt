@@ -75,7 +75,6 @@ class PrintDocument(private var text: String, viewer: Viewer) {
 
         }
 
-
         override fun onLayout(
             oldAttributes: PrintAttributes,
             newAttributes: PrintAttributes,
