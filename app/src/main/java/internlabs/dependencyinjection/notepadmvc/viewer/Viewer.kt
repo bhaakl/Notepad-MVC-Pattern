@@ -12,7 +12,7 @@ import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBindi
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
 import java.util.*
 
-
+// merge
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
@@ -42,18 +42,6 @@ class Viewer : AppCompatActivity() {
         undoRedoManager = TextUndoRedo(binding.editText)
         undoRedoManager.setMaxHistorySize(1000)
     }
-
-   /* fun toastCopied() {
-        Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
-    }
-
-    fun toastPasted() {
-        Toast.makeText(this, "Pasted", Toast.LENGTH_SHORT).show()
-    }
-
-    fun toastCut() {
-        Toast.makeText(this, "Cut Out", Toast.LENGTH_SHORT).show()
-    }*/
 
     /**
      * @param setSelection  переносит курсор в конец строки у edit text
