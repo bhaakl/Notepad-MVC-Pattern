@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true" >
 
+
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/imageMenu"
                 style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
@@ -29,7 +30,9 @@
                 app:navigationIcon="@drawable/ic_menu_24dp"
                 app:title="@string/app_name" />
 
+
         </com.google.android.material.appbar.AppBarLayout>
+
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
