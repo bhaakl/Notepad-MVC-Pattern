@@ -13,19 +13,19 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.InputStream
+import java.io.*
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
 
     private var viewer: Viewer
+    private var context: Context
     private var uri: Uri = Uri.parse("")
 
     init {
         this.viewer = viewer
+        context = viewer
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -80,6 +80,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun new() {
+        viewer.makeEditTextEditable()
         viewer.setTextFromFile("")
         val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
@@ -105,8 +106,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                     viewer.setTextFromFile(it)
                 }
                 uri = uri1
+                viewer.makeEditTextEditable()
             } else {
-                Toast.makeText(viewer, "File extension is not supported", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Файл не поддерживается!", Toast.LENGTH_LONG)
             }
         }
     }
@@ -193,7 +195,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         return if (pasteData.isNotEmpty()) {
             // Если строка содержит данные, то выполняется операция вставки
             viewer.setTextForEditor(pasteData)
-//            viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionStart)
             viewer.toastPasted()
             true
         } else {
@@ -369,7 +370,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
         return false
     }
-
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
         val text = viewer.getEditText().text.toString()
@@ -382,19 +382,18 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
             }
         } catch (e: FileNotFoundException) {
-            Toast.makeText(viewer, "File not found!", Toast.LENGTH_SHORT).show()
+            println("нетуу")
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
-
     // -- служебный метод Сохранить как()
     private val saveAsDoc = viewer.registerForActivityResult(
         ActivityResultContracts
             .CreateDocument("application/ntp")
     ) {
         if (it != null) {
-            if (isOk(it)) {
+            if (isOk(it)){
                 saveToFile(it)
                 uri = it
                 viewer.setTextFromFile("")

@@ -5,15 +5,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
-import androidx.fragment.app.Fragment
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
@@ -128,8 +121,6 @@ class Viewer : AppCompatActivity() {
     fun keyBoardShow() {
         // убирает клавиатуру
         binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
-    fun getText(): String {
-        return binding.etMainField.text.toString()
     }
 
     override fun onDestroy() {
@@ -138,5 +129,10 @@ class Viewer : AppCompatActivity() {
         undoRedoManager.clearHistory()
         undoRedoManager.disconnect()
         close()
+    }
+
+    fun makeEditTextEditable() {
+        binding.editText.isEnabled = true
+        binding.editText.isFocusable = true
     }
 }
