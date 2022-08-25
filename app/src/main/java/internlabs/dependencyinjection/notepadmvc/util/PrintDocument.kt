@@ -24,22 +24,20 @@ import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 
 class PrintDocument(private var text: String, viewer: Viewer) {
 
-        private val context = viewer
+    private val context = viewer
 
 
-
-          fun doPrint() {
-              context.also { context: Context ->
-                  // Get a PrintManager instance
-                  val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
-                  // Set job name, which will be displayed in the print queue
-                  val jobName = "${context.getString(R.string.app_name)} Document"
-                  // Start a print job, passing in a PrintDocumentAdapter implementation
-                  // to handle the generation of a print document
-                  printManager.print(jobName, MyPrintDocumentAdapter(context), null)
-              }
-          }
-
+    fun doPrint() {
+        context.also { context: Context ->
+            // Get a PrintManager instance
+            val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
+            // Set job name, which will be displayed in the print queue
+            val jobName = "${context.getString(R.string.app_name)} Document"
+            // Start a print job, passing in a PrintDocumentAdapter implementation
+            // to handle the generation of a print document
+            printManager.print(jobName, MyPrintDocumentAdapter(context), null)
+        }
+    }
 
 
     inner class MyPrintDocumentAdapter(private var context: Context) : PrintDocumentAdapter() {
@@ -61,7 +59,7 @@ class PrintDocument(private var text: String, viewer: Viewer) {
             var pagenum = pageNumber
             val canvas = page.canvas
 
-          //make sure page numbers start at 1
+            //make sure page numbers start at 1
 
             val titleBaseline = 72
             val lefMargin = 54
@@ -154,4 +152,5 @@ class PrintDocument(private var text: String, viewer: Viewer) {
             callback.onWriteFinished(pageRanges)
 
         }
-    }}
+    }
+}

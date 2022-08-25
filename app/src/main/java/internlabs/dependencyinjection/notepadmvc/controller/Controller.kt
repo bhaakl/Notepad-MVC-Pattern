@@ -6,7 +6,6 @@ import android.os.Build
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
@@ -159,13 +158,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun copy(textCopied: String) {
         val startSelection: Int = viewer.getEditText().selectionStart
         val endSelection: Int = viewer.getEditText().selectionEnd
-        val textCopied: String = viewer.getEditText().text.toString()
+        val cTextCopied: String = viewer.getEditText().text.toString()
         .substring(startSelection, endSelection)
 
-        println("selected text: $textCopied")
+        println("selected text: $cTextCopied")
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("", textCopied))
+        clipboardManager.setPrimaryClip(ClipData.newPlainText("", cTextCopied))
         // Only show a toast for Android 12 and lower.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
             //viewer.toastCopied()
