@@ -12,7 +12,7 @@ import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
-import internlabs.dependencyinjection.notepadmvc.printDocument.PrintDocument
+import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
@@ -49,35 +49,16 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.showAlertDialog()
             }
             R.id.copy -> {
-                val startSelection: Int = viewer.getEditText().selectionStart
-                val endSelection: Int = viewer.getEditText().selectionEnd
-                val selectedText: String = viewer.getEditText().text.toString()
-                    .substring(startSelection, endSelection)
-                println("selected text: $selectedText")
-                copy(selectedText)
+                copy("")
             }
             R.id.paste -> {
                 paste(item)
             }
             R.id.cut -> {
-                val startSelection: Int = viewer.getEditText().selectionStart
-                val endSelection: Int = viewer.getEditText().selectionEnd
-                val selectedText: String = viewer.getEditText().text.toString()
-                    .substring(startSelection, endSelection)
-                cut(selectedText, startSelection, endSelection)
+                cut()
             }
             R.id.printDocument ->{
-                val content : String = viewer.getEditText().text.toString()
-                if(content != ""){
-
-                    val printDocument = PrintDocument(content,viewer)
-                    printDocument.doPrint()
-                }
-                else {
-                    Toast.makeText(viewer,"Документ пустой!",Toast.LENGTH_LONG).show()
-
-                }
-
+                print()
             }
             R.id.undo -> {
                 undo()
@@ -161,8 +142,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-    override fun cut(textCut: String, startSelection: Int, endSelection: Int) {
-        copy(textCut)
+    override fun cut() {
+        val startSelection: Int = viewer.getEditText().selectionStart
+        val endSelection: Int = viewer.getEditText().selectionEnd
+        val selectedText: String = viewer.getEditText().text.toString()
+            .substring(startSelection, endSelection)
+
+        copy(selectedText)
         viewer.getEditText().text =
             viewer.getEditText().text.replace(startSelection, endSelection, "")
         viewer.getEditText().setSelection(startSelection)
@@ -171,6 +157,12 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun copy(textCopied: String) {
+        val startSelection: Int = viewer.getEditText().selectionStart
+        val endSelection: Int = viewer.getEditText().selectionEnd
+        val textCopied: String = viewer.getEditText().text.toString()
+        .substring(startSelection, endSelection)
+
+        println("selected text: $textCopied")
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboardManager.setPrimaryClip(ClipData.newPlainText("", textCopied))
@@ -218,10 +210,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
             false
         }
-    }
-
-    override fun insert() {
-        TODO("Not yet implemented")
     }
 
     override fun delete() {
@@ -335,7 +323,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun print() {
-        //  TODO("Not yet implemented")
+        val content : String = viewer.getEditText().text.toString()
+        if(content != ""){
+            val printDocument = PrintDocument(content,viewer)
+            printDocument.doPrint()
+        }
+        else {
+            viewer.showToast("Документ пустой!")
+        }
     }
 
     override fun recent() {

@@ -19,10 +19,9 @@ interface OurTasks {
     // edit
     fun redo()
     fun undo()
-    fun cut(textCut: String, startSelection: Int, endSelection: Int)
+    fun cut()
     fun copy(textCopied: String)
     fun paste(pasteItem: MenuItem): Boolean
-    fun insert()
     fun delete()
     fun find()
     fun replace()

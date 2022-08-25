@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
-import internlabs.dependencyinjection.notepadmvc.printDocument.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
 import java.util.*
 

@@ -1,4 +1,4 @@
-package internlabs.dependencyinjection.notepadmvc.printDocument
+package internlabs.dependencyinjection.notepadmvc.util
 
 import android.os.Bundle
 
@@ -29,7 +29,7 @@ class PrintDocument(private var text: String, viewer: Viewer) {
 
 
           fun doPrint() {
-              context?.also { context: Context ->
+              context.also { context: Context ->
                   // Get a PrintManager instance
                   val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
                   // Set job name, which will be displayed in the print queue
@@ -120,7 +120,7 @@ class PrintDocument(private var text: String, viewer: Viewer) {
             pageRanges: Array<PageRange>,
             destination: ParcelFileDescriptor,
             cancellationSignal: CancellationSignal,
-            callback: PrintDocumentAdapter.WriteResultCallback
+            callback: WriteResultCallback
 
         ) {
             for (i in 0 until totalPages) {
