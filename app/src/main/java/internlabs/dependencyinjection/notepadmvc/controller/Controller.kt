@@ -47,7 +47,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 val endSelection: Int = viewer.getEditText().selectionEnd
                 val selectedText: String = viewer.getEditText().text.toString()
                     .substring(startSelection, endSelection)
-                println("selected text: $selectedText")
                 copy(selectedText)
             }
             R.id.paste -> {
@@ -67,7 +66,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun new() {
-        viewer.setTextFromFile("")
+        viewer.setTextForEditor("")
         val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
@@ -84,10 +83,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     { uri1 ->
         if (uri1 != null) {
             if (isOk(uri1)) {
-                println("......................")
+//                println("......................")
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
-                    println(it)
+//                    println(it)
                     viewer.setTextFromFile(it) }
                 uri = uri1
             } else {
@@ -131,7 +130,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         viewer.getEditText().text =
             viewer.getEditText().text.replace(startSelection, endSelection, "")
         viewer.getEditText().setSelection(startSelection)
-        viewer.toastCut()
+        Toast.makeText(viewer, "Cut out", Toast.LENGTH_SHORT).show()
     }
 
     override fun copy(textCopied: String) {
@@ -140,7 +139,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         clipboardManager.setPrimaryClip(ClipData.newPlainText("", textCopied))
         // Only show a toast for Android 12 and lower.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-            viewer.toastCopied()
+            Toast.makeText(viewer, "Copied", Toast.LENGTH_SHORT).show()
         viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
     }
 
@@ -168,12 +167,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
         // Gets the clipboard as text.
         pasteData = item?.text.toString()
-        println("PASTED text: $pasteData")
         return if (pasteData.isNotEmpty()) {
             // Если строка содержит данные, то выполняется операция вставки
             viewer.setTextForEditor(pasteData)
 //            viewer.getBinding().editText.setSelection(viewer.getBinding().editText.selectionStart)
-            viewer.toastPasted()
+            Toast.makeText(viewer, "Pasted", Toast.LENGTH_SHORT).show()
             true
         } else {
             // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
@@ -369,7 +367,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 uri = it
                 viewer.setTextFromFile("")
             } else {
-
                 Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
             }
         }

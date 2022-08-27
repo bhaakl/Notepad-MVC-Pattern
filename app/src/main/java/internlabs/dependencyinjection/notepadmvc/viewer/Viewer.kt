@@ -1,6 +1,7 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
@@ -37,45 +38,33 @@ class Viewer : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener(controller)
     }
 
-
-    fun toastCopied() {
-        Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
-    }
-
-    fun toastPasted() {
-        Toast.makeText(this, "Pasted", Toast.LENGTH_SHORT).show()
-    }
-
-    fun toastCut() {
-        Toast.makeText(this, "Cut Out", Toast.LENGTH_SHORT).show()
-    }
-
     /**
      * @param setSelection  переносит курсор в конец строки у edit text
      */
     fun setTextFromFile(string: String) {
-        binding.editText.setText(string)
-        binding.editText.setSelection(binding.editText.text.length)
+        getEditText().setText(string)
+        getEditText().setSelection(getEditText().text.length)
     }
 
     /**
      * setTextForEditor(): На  вход подается текст, который нужно поместить в ЕдитТекст. Задача этой функции
-     * поместить этот текст: определяется позиция для вставки текста и вставляется
-     * обновляя при этом курсор.
+     * поместить этот текст: определяется позиция для вставки текста, т.е где курсор, туда и вставляется
+     * обновляя при этом курсор в конец вставляемого текста
      */
     fun setTextForEditor(strAdd: String) {
         if (strAdd.isEmpty()) {
+            getEditText().setText(strAdd)
             return
         }
-        val old = binding.editText.text.toString()
-        val cursor: Int = binding.editText.selectionStart
+        val old = getEditText().text.toString()
+        val cursor: Int = getEditText().selectionStart
         val leftStr = old.substring(0, cursor)
         val rightStr = old.substring(cursor)
-        if (binding.editText.text.isEmpty())
-            binding.editText.setText(strAdd)
+        if (getEditText().text.isEmpty())
+            getEditText().setText(strAdd)
         else
-            binding.editText.setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
-        binding.editText.setSelection(cursor + strAdd.length)
+            getEditText().setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
+        getEditText().setSelection(cursor + strAdd.length)
     }
 
     fun showAlertDialog() {
