@@ -1,19 +1,24 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
+import android.annotation.SuppressLint
 import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
+import internlabs.dependencyinjection.notepadmvc.controller.findUtil.BMooreMatchText
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
+
 
 //-
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
@@ -59,6 +64,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                     .substring(startSelection, endSelection)
                 cut(selectedText, startSelection, endSelection)
             }
+            R.id.searchText -> {
+                find()
+            }
         }
         item.isChecked = true;
         viewer.getDrawerLayout().close()
@@ -70,9 +78,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
-        uri = FileProvider.getUriForFile(viewer,
+        uri = FileProvider.getUriForFile(
+            viewer,
             "internlabs.dependencyinjection.notepadmvc.provider",
-            file1)
+            file1
+        )
     }
 
     override fun open() {
@@ -87,7 +97,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
 //                    println(it)
-                    viewer.setTextFromFile(it) }
+                    viewer.setTextFromFile(it)
+                }
                 uri = uri1
             } else {
                 Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
@@ -189,8 +200,44 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         TODO("Not yet implemented")
     }
 
+    @SuppressLint("InflateParams")
     override fun find() {
-        TODO("Not yet implemented")
+        val inflater: LayoutInflater = LayoutInflater.from(viewer)
+        val view: View = inflater.inflate(R.layout.feature_find, null)
+        val mBuilder = androidx.appcompat.app.AlertDialog.Builder(viewer)
+            .setTitle("Find")
+            .setIcon(R.drawable.ic_search_in)
+            .setView(view)
+            .setPositiveButton("Find next", null)
+            .setNegativeButton("Cancel", null)
+            .show()
+
+        val mPositiveButton = mBuilder.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+        val editTextFind = view.findViewById<EditText>(R.id.findWhat)
+
+        var posD = 0
+        mPositiveButton.setOnClickListener {
+            if (viewer.getEditText().text.isNotEmpty()) {
+                val matchingAnswer = BMooreMatchText.search(
+                    viewer.getEditText().text.toString().toCharArray(),
+                    editTextFind.text.toString().toCharArray()
+                )
+                if (matchingAnswer.isNotEmpty()) {
+                    if (posD == matchingAnswer.size || posD > matchingAnswer.size ) posD = 0
+                    val edFind = editTextFind.text.toString()
+                    viewer.getEditText().setSelection(
+                        matchingAnswer[posD++],
+                        matchingAnswer[posD - 1] + edFind.length
+                    )
+                } else {
+                    Toast.makeText(
+                        viewer,
+                        "'${editTextFind.text}' not found!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } else Toast.makeText(viewer, "Text empty!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun replace() {
@@ -341,11 +388,12 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
         return false
     }
+
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
         val text = viewer.getEditText().text.toString()
         try {
-            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use {content ->
+            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use { content ->
                 FileOutputStream(content.fileDescriptor).use { fos ->
                     fos.write(text.toByteArray())
                     fos.flush()
@@ -358,11 +406,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             e.printStackTrace()
         }
     }
+
     // -- служебный метод Сохранить как()
-    private val saveAsDoc = viewer.registerForActivityResult(ActivityResultContracts
-        .CreateDocument("application/ntp")){
+    private val saveAsDoc = viewer.registerForActivityResult(
+        ActivityResultContracts
+            .CreateDocument("application/ntp")
+    ) {
         if (it != null) {
-            if (isOk(it)){
+            if (isOk(it)) {
                 saveToFile(it)
                 uri = it
                 viewer.setTextFromFile("")

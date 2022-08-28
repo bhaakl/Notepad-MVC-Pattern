@@ -1,10 +1,8 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.os.Bundle
-import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
@@ -25,7 +23,6 @@ class Viewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         initListeners()
     }
 
@@ -100,6 +97,6 @@ class Viewer : AppCompatActivity() {
 
     fun keyBoardShow() {
         // убирает клавиатуру
-        binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+        getEditText().onEditorAction(EditorInfo.IME_ACTION_DONE)
     }
 }
