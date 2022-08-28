@@ -323,13 +323,21 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun print() {
         val content : String = viewer.getEditText().text.toString()
-        if(content != ""){
-            val printDocument = PrintDocument(content,viewer)
+        if(content != "" && contentIsNormal(content)){
+            val printDocument = PrintDocument(content,this.viewer, viewer.getFonts())
             printDocument.doPrint()
         }
         else {
             viewer.showToast("Документ пустой!")
         }
+    }
+
+    private fun contentIsNormal(content: String): Boolean {
+        content.forEach {
+            println(".....$it")
+            if (it != ' ' && it != '\n') return true
+        }
+        return false
     }
 
     override fun recent() {
