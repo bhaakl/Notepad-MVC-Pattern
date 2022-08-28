@@ -9,13 +9,13 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.findUtil.BMooreMatchText
+import internlabs.dependencyinjection.notepadmvc.controller.textEditUtil.TextEditor
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
@@ -52,20 +52,25 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.showAlertDialog()
             }
             R.id.copy -> {
-                copy("")
+                copy()
             }
             R.id.paste -> {
                 paste(item)
             }
             R.id.cut -> {
-                val startSelection: Int = viewer.getEditText().selectionStart
-                val endSelection: Int = viewer.getEditText().selectionEnd
-                val selectedText: String = viewer.getEditText().text.toString()
-                    .substring(startSelection, endSelection)
-                cut(selectedText, startSelection, endSelection)
+                cut()
+            }
+            R.id.delete -> {
+                delete()
+            }
+            R.id.select_all -> {
+                selectAll()
             }
             R.id.undo -> {
                 undo()
+            }
+            R.id.printDocument -> {
+                print()
             }
             R.id.redo -> {
                 redo()
@@ -150,74 +155,39 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun cut() {
-        val startSelection: Int = viewer.getEditText().selectionStart
-        val endSelection: Int = viewer.getEditText().selectionEnd
-        val selectedText: String = viewer.getEditText().text.toString()
-            .substring(startSelection, endSelection)
-
-        copy(selectedText)
-        viewer.getEditText().text =
-            viewer.getEditText().text.replace(startSelection, endSelection, "")
-        viewer.getEditText().setSelection(startSelection)
-        viewer.showToast("Cut Out")
-    }
-
-    override fun copy(textCopied: String) {
-        val startSelection: Int = viewer.getEditText().selectionStart
-        val endSelection: Int = viewer.getEditText().selectionEnd
-        val cTextCopied: String = viewer.getEditText().text.toString()
-        .substring(startSelection, endSelection)
-
-        println("selected text: $cTextCopied")
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("", cTextCopied))
-        // Only show a toast for Android 12 and lower.
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-            //viewer.toastCopied()
-            viewer.showToast("Copied")
-        viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
+        if (TextEditor.cut(viewer.getEditText(), clipboardManager))
+            viewer.showToast("Cut Out")
     }
 
-    override fun paste(pasteItem: MenuItem): Boolean {
-        val clipboard =
+    override fun copy() {
+        val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        var pasteData: String = ""
+        if (TextEditor.copy(viewer.getEditText(), clipboardManager))
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+            viewer.showToast("Copied")
+    }
 
-        // Если в буфере обмена нет данных, отключаем пункт меню вставки.
-        // Если он содержит данные, решите, можете ли вы обрабатывать данные.
-        pasteItem.isEnabled = when {
-            !clipboard.hasPrimaryClip() -> {
-                false
-            }
-            !(clipboard.primaryClipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN))!! -> {
-                // Это отключает пункт меню вставки, так как в буфере обмена есть данные, но это не обычный текст
-                false
-            }
-            else -> {
-                // Это включает пункт меню вставки, так как буфер обмена содержит обычный текст.
-                true
-            }
-        }
-        val item = clipboard.primaryClip?.getItemAt(0)
-
+    override fun paste(pasteItem: MenuItem) {
+        val clipboardManager =
+            viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         // Gets the clipboard as text.
-        pasteData = item?.text.toString()
-        return if (pasteData.isNotEmpty()) {
+        val pasteData = TextEditor.paste(clipboardManager, pasteItem)
+        if (pasteData.isNotEmpty()) {
             // Если строка содержит данные, то выполняется операция вставки
             viewer.setTextForEditor(pasteData)
-            //viewer.showToast("Pasted")
-            true
+            viewer.showToast("Pasted")
         } else {
             // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
             // содержат текст. Сообщить об ошибке.
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
-            false
         }
     }
 
     override fun delete() {
-        TODO("Not yet implemented")
+        if(TextEditor.delete(viewer.getEditText()))
+            viewer.showToast("Deleted")
     }
 
     @SuppressLint("InflateParams")
@@ -230,6 +200,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setView(view)
             .setPositiveButton("Find next", null)
             .setNegativeButton("Cancel", null)
+            .setCancelable(true)
             .show()
 
         val mPositiveButton = mBuilder.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
@@ -249,14 +220,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                         matchingAnswer[posD++],
                         matchingAnswer[posD - 1] + edFind.length
                     )
-                } else {
-                    Toast.makeText(
-                        viewer,
-                        "'${editTextFind.text}' not found!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            } else Toast.makeText(viewer, "Text empty!", Toast.LENGTH_SHORT).show()
+                } else
+                    viewer.showToast("'${editTextFind.text}' not found!")
+            } else
+                viewer.showToast("Text empty!")
         }
     }
 
@@ -265,7 +232,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun selectAll() {
-        TODO("Not yet implemented")
+        viewer.getEditText().selectAll()
     }
 
     override fun dateAndTime() {

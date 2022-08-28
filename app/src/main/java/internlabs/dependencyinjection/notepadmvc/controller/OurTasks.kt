@@ -20,8 +20,8 @@ interface OurTasks {
     fun redo()
     fun undo()
     fun cut()
-    fun copy(textCopied: String)
-    fun paste(pasteItem: MenuItem): Boolean
+    fun copy()
+    fun paste(pasteItem: MenuItem)
     fun delete()
     fun find()
     fun replace()

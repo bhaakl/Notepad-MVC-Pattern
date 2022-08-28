@@ -28,7 +28,6 @@ class Viewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         initListeners()
     }
 
@@ -71,7 +70,6 @@ class Viewer : AppCompatActivity() {
         else
             getEditText().setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
         getEditText().setSelection(cursor + strAdd.length)
-        showToast("Pasted")
     }
 
     fun showAlertDialog() {
