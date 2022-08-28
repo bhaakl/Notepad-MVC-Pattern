@@ -3,17 +3,22 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
+import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
+import java.util.*
 
 
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
-    lateinit var alertDialog: AlertDialog.Builder
+    private lateinit var alertDialog: AlertDialog.Builder
+
+    private lateinit var undoRedoManager: TextUndoRedo
 
     init {
         controller = Controller(viewer = this)
@@ -23,16 +28,20 @@ class Viewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         initListeners()
     }
 
     private fun initListeners() = with(binding) {
         imageMenu.setNavigationOnClickListener {
             drawerLayout.open()
-            binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+            editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
         }
 
         navigationView.setNavigationItemSelectedListener(controller)
+
+        undoRedoManager = TextUndoRedo(binding.editText)
+        undoRedoManager.setMaxHistorySize(1000)
     }
 
     /**
@@ -49,8 +58,8 @@ class Viewer : AppCompatActivity() {
      * обновляя при этом курсор в конец вставляемого текста
      */
     fun setTextForEditor(strAdd: String) {
-        if (strAdd.isEmpty()) {
-            getEditText().setText(strAdd)
+        if (strAdd.isEmpty() || !binding.editText.isEnabled) { // нельзя выставить пока документ не создан
+            showToast("нельзя вставить текст пока документ не создан")
             return
         }
         val old = getEditText().text.toString()
@@ -62,6 +71,7 @@ class Viewer : AppCompatActivity() {
         else
             getEditText().setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
         getEditText().setSelection(cursor + strAdd.length)
+        showToast("Pasted")
     }
 
     fun showAlertDialog() {
@@ -83,6 +93,10 @@ class Viewer : AppCompatActivity() {
         alertDialog.show()
     }
 
+    fun getUndoRedoManager(): TextUndoRedo {
+        return undoRedoManager
+    }
+
     fun getEditText(): EditText {
         return binding.editText
     }
@@ -91,12 +105,29 @@ class Viewer : AppCompatActivity() {
         return binding.drawerLayout
     }
 
-    fun close(){
+    private fun close() {
         binding.drawerLayout.close()
     }
 
     fun keyBoardShow() {
         // убирает клавиатуру
         getEditText().onEditorAction(EditorInfo.IME_ACTION_DONE)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        undoRedoManager.clearHistory()
+        undoRedoManager.disconnect()
+        close()
+    }
+
+    fun makeEditTextEditable() {
+        binding.editText.isEnabled = true
+        binding.editText.isFocusable = true
+    }
+
+    fun showToast(s: String) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
     }
 }

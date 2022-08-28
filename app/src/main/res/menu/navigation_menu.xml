@@ -35,6 +35,11 @@
                     android:checkable="true"
                     android:icon="@drawable/ic_recent"
                     android:title="@string/recent" />
+                <item
+                    android:id="@+id/printDocument"
+                    android:checkable="true"
+                    android:icon="@drawable/ic_baseline_print"
+                    android:title="@string/print"/>
 
                 <item
                     android:id="@+id/settings"
