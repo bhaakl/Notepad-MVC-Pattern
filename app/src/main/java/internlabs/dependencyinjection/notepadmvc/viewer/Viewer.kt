@@ -132,18 +132,6 @@ class Viewer : AppCompatActivity() {
 
     }
 
-//    fun showAlertDialog() {
-//      val alertDialog = AlertDialog.Builder(this)
-//        alertDialog.setTitle("Exit")
-//            .setMessage(" вы точно хоите выйти ?")
-//            .setCancelable(true)
-//            .setPositiveButton(" Позже") { dialogInterface, _ -> dialogInterface.cancel() }
-//            .setNegativeButton(" да") { _, _ -> finish()
-//           /* exitProcess(0)*/ }
-//        alertDialog.show()
-//    }
-
-
     fun close() {
         binding.drawerLayout.close()
     }
