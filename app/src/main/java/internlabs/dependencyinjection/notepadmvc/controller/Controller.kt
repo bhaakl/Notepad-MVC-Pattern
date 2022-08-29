@@ -1,6 +1,5 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.*
 import android.graphics.Color
@@ -24,12 +23,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
-import internlabs.dependencyinjection.notepadmvc.BuildConfig
+
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
 import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
+
 import java.io.*
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
@@ -182,11 +182,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun copy() {
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("", textCopied))
-        // Only show a toast for Android 12 and lower.
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-            viewer.toastCopied()
-        viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
+        if (TextEditor.copy(viewer.getEditText(), clipboardManager))
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+                viewer.showToast("Copied")
+
     }
 
     override fun paste(pasteItem: MenuItem) {
@@ -202,7 +201,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
             // содержат текст. Сообщить об ошибке.
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
-            false
         }
     }
 
@@ -211,11 +209,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             viewer.showToast("Deleted")
     }
 
-    @SuppressLint("InflateParams")
     override fun find() {
         val inflater: LayoutInflater = LayoutInflater.from(viewer)
         val view: View = inflater.inflate(R.layout.feature_find, null)
-        val mBuilder = androidx.appcompat.app.AlertDialog.Builder(viewer)
+        val mBuilder = AlertDialog.Builder(viewer)
             .setTitle("Find")
             .setIcon(R.drawable.ic_search_in)
             .setView(view)
@@ -224,7 +221,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setCancelable(true)
             .show()
 
-        val mPositiveButton = mBuilder.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+        val mPositiveButton = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
         val editTextFind = view.findViewById<EditText>(R.id.findWhat)
 
         var posD = 0
