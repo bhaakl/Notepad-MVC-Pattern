@@ -14,8 +14,8 @@ import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
-import internlabs.dependencyinjection.notepadmvc.controller.findUtil.BMooreMatchText
-import internlabs.dependencyinjection.notepadmvc.controller.textEditUtil.TextEditor
+import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
+import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*

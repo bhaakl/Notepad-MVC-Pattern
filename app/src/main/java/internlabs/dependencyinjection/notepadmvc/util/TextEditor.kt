@@ -1,4 +1,4 @@
-package internlabs.dependencyinjection.notepadmvc.controller.textEditUtil
+package internlabs.dependencyinjection.notepadmvc.util
 
 import android.content.ClipData
 import android.content.ClipDescription
