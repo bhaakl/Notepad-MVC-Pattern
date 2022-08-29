@@ -17,6 +17,7 @@ import android.widget.AdapterView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
@@ -24,6 +25,7 @@ import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
+import kotlin.system.exitProcess
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
@@ -57,6 +59,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
             R.id.about_app -> {
                 aboutApp()
+            }
+
+            R.id.exit -> {
+                exit()
             }
 
             R.id.copy -> {
@@ -381,7 +387,15 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun exit() {
-        TODO("Not yet implemented")
+        val alertDialog = AlertDialog.Builder(viewer)
+        alertDialog.setTitle("Exit")
+            .setMessage(" вы точно хоите выйти ?")
+            .setCancelable(true)
+            .setPositiveButton(" Позже") { dialogInterface, _ -> dialogInterface.cancel() }
+            .setNegativeButton(" да") { _, _ ->
+                // exitProcess(0)
+            viewer.finish()}
+        alertDialog.show()
     }
 
     override fun onClick(v: View) {
@@ -423,7 +437,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.animateFab()
                 alignCenter()
             }
-
         }
     }
 

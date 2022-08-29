@@ -5,13 +5,16 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
+import kotlin.system.exitProcess
 
 class Viewer : AppCompatActivity() {
+
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
     private var isOpenFab = false
@@ -42,6 +45,7 @@ class Viewer : AppCompatActivity() {
         alignCenter.setOnClickListener (controller)
         alignRight.setOnClickListener (controller)
         controller.size()
+
     }
 
     fun toastCopied() {
@@ -127,6 +131,18 @@ class Viewer : AppCompatActivity() {
         }
 
     }
+
+//    fun showAlertDialog() {
+//      val alertDialog = AlertDialog.Builder(this)
+//        alertDialog.setTitle("Exit")
+//            .setMessage(" вы точно хоите выйти ?")
+//            .setCancelable(true)
+//            .setPositiveButton(" Позже") { dialogInterface, _ -> dialogInterface.cancel() }
+//            .setNegativeButton(" да") { _, _ -> finish()
+//           /* exitProcess(0)*/ }
+//        alertDialog.show()
+//    }
+
 
     fun close() {
         binding.drawerLayout.close()

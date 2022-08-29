@@ -18,6 +18,7 @@
     <string name="edit">Edit</string>
     <string name="other">Other</string>
     <string name="about_app">About app</string>
+    <string name="exit">Exit</string>
     <array name="size">
         <item>size</item>
         <item>"20"</item>
