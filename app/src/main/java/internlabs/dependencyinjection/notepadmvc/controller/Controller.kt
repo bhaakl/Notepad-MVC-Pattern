@@ -25,7 +25,6 @@ import internlabs.dependencyinjection.notepadmvc.BuildConfig
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
-import kotlin.system.exitProcess
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
@@ -389,10 +388,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun exit() {
         val alertDialog = AlertDialog.Builder(viewer)
         alertDialog.setTitle("Exit")
-            .setMessage(" вы точно хоите выйти ?")
+            .setMessage(" Do you want to exit? ")
             .setCancelable(true)
-            .setPositiveButton(" Позже") { dialogInterface, _ -> dialogInterface.cancel() }
-            .setNegativeButton(" да") { _, _ ->
+            .setPositiveButton(" Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
+            .setNegativeButton(" Yes") { _, _ ->
                 // exitProcess(0)
             viewer.finish()}
         alertDialog.show()

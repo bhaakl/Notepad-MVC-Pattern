@@ -38,12 +38,12 @@ class Viewer : AppCompatActivity() {
 
         navigationView.setNavigationItemSelectedListener(controller)
         fab.setOnClickListener(controller)
-        bolt.setOnClickListener (controller)
-        italic.setOnClickListener (controller)
-        underline.setOnClickListener (controller)
-        alignLeft.setOnClickListener (controller)
-        alignCenter.setOnClickListener (controller)
-        alignRight.setOnClickListener (controller)
+        bolt.setOnClickListener(controller)
+        italic.setOnClickListener(controller)
+        underline.setOnClickListener(controller)
+        alignLeft.setOnClickListener(controller)
+        alignCenter.setOnClickListener(controller)
+        alignRight.setOnClickListener(controller)
         controller.size()
 
     }
@@ -100,9 +100,9 @@ class Viewer : AppCompatActivity() {
     fun animateFab() = with(binding) {
         if (isOpenFab) {
             fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.rotat_forward))
-            alignCenter.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
-            alignRight.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
-            alignLeft.startAnimation(AnimationUtils.loadAnimation(this@Viewer,R.anim.fab_close))
+            alignCenter.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            alignRight.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            alignLeft.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
             bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
             italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
             underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
