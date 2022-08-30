@@ -69,7 +69,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
                 println(pageWidth)
             }
             makeCorrectLines()
-            totalPages = computePageCount(newAttributes)
+            totalPages = computePageCount()
 
             if (cancellationSignal.isCanceled) {
                 callback.onLayoutCancelled()
@@ -154,7 +154,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
 
         }
 
-        private fun computePageCount(printAttributes: PrintAttributes): Int {
+        private fun computePageCount(): Int {
             val bounds = Rect()
 
             fonts.getTextBounds(text, 0, text.length, bounds)
