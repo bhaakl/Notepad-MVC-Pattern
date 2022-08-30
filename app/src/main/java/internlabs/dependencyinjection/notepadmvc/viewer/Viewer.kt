@@ -42,6 +42,7 @@ class Viewer : AppCompatActivity() {
         bolt.setOnClickListener(controller)
         italic.setOnClickListener(controller)
         underline.setOnClickListener(controller)
+        noFormat.setOnClickListener(controller)
         alignLeft.setOnClickListener(controller)
         alignCenter.setOnClickListener(controller)
         alignRight.setOnClickListener(controller)
@@ -124,9 +125,11 @@ class Viewer : AppCompatActivity() {
             bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
             italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
             underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            noFormat.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
             bolt.isClickable = false
             italic.isClickable = false
             underline.isClickable = false
+            noFormat.isClickable = false
             alignCenter.isClickable = false
             alignRight.isClickable = false
             alignLeft.isClickable = false
@@ -139,9 +142,11 @@ class Viewer : AppCompatActivity() {
             bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
             italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
             underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            noFormat.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
             bolt.isClickable = true
             italic.isClickable = true
             underline.isClickable = true
+            noFormat.isClickable = true
             alignCenter.isClickable = true
             alignLeft.isClickable = true
             alignRight.isClickable = true
