@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -18,8 +19,8 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
-import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
+import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
@@ -28,8 +29,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener {
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
-    private var pasteItemInNavMenu: MenuItem? = null
-    private var pasteItemInBotMenu: MenuItem? = null
+    private var pasteItemInNavMenu: MenuItem? = null  //used for method paste()
+    private var pasteItemInBotMenu: MenuItem? = null  //used for method paste()
 
     init {
         this.viewer = viewer
@@ -93,7 +94,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     // bottomAppBar click handler
     override fun onMenuItemClick(item: MenuItem?): Boolean {
-       return when (item?.itemId) {
+        return when (item?.itemId) {
             R.id.more -> {
                 viewer.getDrawerLayout().open()
                 true
@@ -117,32 +118,32 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.getUndoRedoManager().clearHistory()
                 true
             }
-           R.id.newFileBtm -> {
-               new()
-               viewer.getUndoRedoManager().clearHistory()
-               true
-           }
-           R.id.searchBtm -> {
-               find()
-               true
-           }
-           R.id.redoBtm -> {
-               redo()
-               true
-           }
-           R.id.undoBtm -> {
-               undo()
-               true
-           }
-           R.id.pasteBtm -> {
-               paste(item)
-               pasteItemInBotMenu = item
-               true
-           }
-           R.id.copyBtm -> {
-               copy()
-               true
-           }
+            R.id.newFileBtm -> {
+                new()
+                viewer.getUndoRedoManager().clearHistory()
+                true
+            }
+            R.id.searchBtm -> {
+                find()
+                true
+            }
+            R.id.redoBtm -> {
+                redo()
+                true
+            }
+            R.id.undoBtm -> {
+                undo()
+                true
+            }
+            R.id.pasteBtm -> {
+                paste(item)
+                pasteItemInBotMenu = item
+                true
+            }
+            R.id.copyBtm -> {
+                copy()
+                true
+            }
             else -> false
         }
     }
@@ -205,14 +206,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun redo() {
         val manager = viewer.getUndoRedoManager()
-        if(manager.canRedo) {
+        if (manager.canRedo) {
             manager.redo()
         }
     }
 
     override fun undo() {
         val manager = viewer.getUndoRedoManager()
-        if(manager.canUndo) {
+        if (manager.canUndo) {
             manager.undo()
         }
     }
@@ -261,11 +262,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun delete() {
-        if(TextEditor.delete(viewer.getEditText()))
+        if (TextEditor.delete(viewer.getEditText()))
             viewer.showToast("Deleted")
     }
 
-    @SuppressLint("InflateParams")
+    @SuppressLint("InflateParams", "ResourceAsColor")
     override fun find() {
         val inflater: LayoutInflater = LayoutInflater.from(viewer)
         val view: View = inflater.inflate(R.layout.feature_find, null)
@@ -279,6 +280,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .show()
 
         val mPositiveButton = mBuilder.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+        mPositiveButton.setTextColor(Color.CYAN)
+        val mNegativeButton = mBuilder.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+        mNegativeButton.setTextColor(Color.RED)
         val editTextFind = view.findViewById<EditText>(R.id.findWhat)
 
         var posD = 0
@@ -289,7 +293,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                     editTextFind.text.toString().toCharArray()
                 )
                 if (matchingAnswer.isNotEmpty()) {
-                    if (posD == matchingAnswer.size || posD > matchingAnswer.size ) posD = 0
+                    if (posD == matchingAnswer.size || posD > matchingAnswer.size) posD = 0
                     val edFind = editTextFind.text.toString()
                     viewer.getEditText().setSelection(
                         matchingAnswer[posD++],
@@ -405,12 +409,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun print() {
-        val content : String = viewer.getEditText().text.toString()
-        if(content != ""){
-            val printDocument = PrintDocument(content,viewer)
+        val content: String = viewer.getEditText().text.toString()
+        if (content != "") {
+            val printDocument = PrintDocument(content, viewer)
             printDocument.doPrint()
-        }
-        else {
+        } else {
             viewer.showToast("Документ пустой!")
         }
     }
@@ -450,7 +453,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 if (extensionOfFile == "ntp"
                     || extensionOfFile == "kt"
                     || extensionOfFile == "swift"
-                    || extensionOfFile == "java") {
+                    || extensionOfFile == "java"
+                ) {
                     val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
                     val max = 5629273
                     if (size != null) {
@@ -461,6 +465,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
         return false
     }
+
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
         val text = viewer.getEditText().text.toString()
@@ -478,6 +483,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             e.printStackTrace()
         }
     }
+
     // -- служебный метод Сохранить как()
     private val saveAsDoc = viewer.registerForActivityResult(
         ActivityResultContracts
