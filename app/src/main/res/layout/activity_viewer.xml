@@ -41,6 +41,7 @@
                 android:id="@+id/editText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:imeOptions="flagNoExtractUi"
                 android:autofillHints="false"
                 android:background="@color/white"
                 android:enabled="false"
@@ -53,9 +54,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:fitsSystemWindows="true"
-            android:layout_height="match_parent">
+            android:fitsSystemWindows="true">
 
             <com.google.android.material.bottomappbar.BottomAppBar
                 android:id="@+id/bottomAppBar"

@@ -2,6 +2,7 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast

@@ -51,14 +51,15 @@ class TextEditor {
                     false
                 }
                 else -> {
+                    val item = clipboardManager.primaryClip?.getItemAt(0)
+
+                    // Gets the clipboard as text.
+                    pasteData = item?.text.toString()
                     // Это включает пункт меню вставки, так как буфер обмена содержит обычный текст.
                     true
                 }
             }
-            val item = clipboardManager.primaryClip?.getItemAt(0)
 
-            // Gets the clipboard as text.
-            pasteData = item?.text.toString()
             return pasteData
         }
 

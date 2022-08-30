@@ -14,37 +14,43 @@
         android:id="@+id/pasteBtm"
         android:icon="@drawable/ic_paste_btm"
         android:title="@string/paste"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction"/>
 
     <item
         android:id="@+id/undoBtm"
         android:icon="@drawable/ic_undo_btm"
         android:title="@string/undo"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction"/>
     <item
         android:id="@+id/redoBtm"
         android:icon="@drawable/ic_redo_btm"
         android:title="@string/redo"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction"/>
 
     <item
         android:id="@+id/searchBtm"
         android:icon="@drawable/ic_search_in_btm"
         android:title="@string/search_in"
         android:contentDescription="@string/content_description_search"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction"/>
 
     <item
         android:id="@+id/newFileBtm"
         android:icon="@drawable/ic_new_file_btm"
         app:showAsAction="always"
-        android:title="@string/_new" />
+        android:title="@string/_new"
+        tools:ignore="AlwaysShowAction"/>
 
     <item
         android:id="@+id/saveBtm"
         android:icon="@drawable/ic_save_file_btm"
         android:title="@string/save"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction"/>
 
     <item
         android:id="@+id/openFileBtm"

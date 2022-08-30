@@ -28,6 +28,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener {
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
+    private var pasteItemInNavMenu: MenuItem? = null
+    private var pasteItemInBotMenu: MenuItem? = null
 
     init {
         this.viewer = viewer
@@ -60,6 +62,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             }
             R.id.paste -> {
                 paste(item)
+                pasteItemInNavMenu = item
             }
             R.id.cut -> {
                 cut()
@@ -133,6 +136,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
            }
            R.id.pasteBtm -> {
                paste(item)
+               pasteItemInBotMenu = item
                true
            }
            R.id.copyBtm -> {
@@ -216,16 +220,26 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun cut() {
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        if (TextEditor.cut(viewer.getEditText(), clipboardManager))
+        if (TextEditor.cut(viewer.getEditText(), clipboardManager)) {
             viewer.showToast("Cut Out")
+            if (pasteItemInNavMenu?.isEnabled == false)
+                pasteItemInNavMenu?.isEnabled = true
+            if (pasteItemInBotMenu?.isEnabled == false)
+                pasteItemInBotMenu?.isEnabled = true
+        }
     }
 
     override fun copy() {
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        if (TextEditor.copy(viewer.getEditText(), clipboardManager))
+        if (TextEditor.copy(viewer.getEditText(), clipboardManager)) {
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-            viewer.showToast("Copied")
+                viewer.showToast("Copied")
+            if (pasteItemInNavMenu?.isEnabled == false || pasteItemInBotMenu?.isEnabled == false) {
+                pasteItemInNavMenu?.isEnabled = true
+                pasteItemInBotMenu?.isEnabled = true
+            }
+        }
     }
 
     override fun paste(pasteItem: MenuItem) {
@@ -234,12 +248,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         // Gets the clipboard as text.
         val pasteData = TextEditor.paste(clipboardManager, pasteItem)
         if (pasteData.isNotEmpty()) {
+            if (!pasteItem.isEnabled) pasteItem.isEnabled = true
             // Если строка содержит данные, то выполняется операция вставки
             viewer.setTextForEditor(pasteData)
             viewer.showToast("Pasted")
         } else {
             // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
             // содержат текст. Сообщить об ошибке.
+            viewer.showToast("Clipboard is empty!")
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
         }
     }
