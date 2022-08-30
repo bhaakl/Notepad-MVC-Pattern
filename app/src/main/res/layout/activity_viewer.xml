@@ -47,7 +47,6 @@
                 android:background="@color/white"
                 android:gravity="top|left"
                 android:enabled="false"
-                android:visibility="gone"
                 android:inputType="textMultiLine"
                 android:maxLength="6000000"
                 tools:ignore="LabelFor,RtlHardcoded" />

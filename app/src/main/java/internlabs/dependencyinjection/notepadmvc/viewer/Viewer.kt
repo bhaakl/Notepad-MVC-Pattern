@@ -129,7 +129,6 @@ class Viewer : AppCompatActivity() {
     fun makeEditTextEditable() {
         binding.editText.isEnabled = true
         binding.editText.isFocusable = true
-        binding.editText.isInvisible = false
     }
 
     fun showToast(s: String) {
