@@ -31,6 +31,7 @@ import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 
 import java.io.*
+import kotlin.system.exitProcess
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
@@ -324,6 +325,12 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         editText.text = spannableString
     }
 
+    override fun makeRegularFormat() {
+        val editText = viewer.getEditText()
+        val stringText :String = editText.text.toString()
+        editText.setText(stringText)
+    }
+
     override fun makeCrossedOut() {
         TODO("Not yet implemented")
     }
@@ -413,6 +420,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         dialog.show()
     }
 
+    
     override fun sentToEmail() {
         TODO("Not yet implemented")
     }
@@ -424,8 +432,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setCancelable(true)
             .setPositiveButton(" Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
             .setNegativeButton(" Yes") { _, _ ->
-                // exitProcess(0)
-            viewer.finish()}
+                 exitProcess(0)
+           // viewer.finish()
+            }
         alertDialog.show()
     }
 
@@ -452,6 +461,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             R.id.underline -> {
                 viewer.animateFab()
                 makeUnderlined()
+            }
+
+            R.id.no_format -> {
+                viewer.animateFab()
+                makeRegularFormat()
             }
 
             R.id.align_left -> {

@@ -41,6 +41,7 @@ interface OurTasks {
     fun makeItalic()
     fun makeCursive()
     fun makeUnderlined()
+    fun makeRegularFormat()
     fun makeCrossedOut()
     fun makeSubscript()
     fun makeSuperscript()
