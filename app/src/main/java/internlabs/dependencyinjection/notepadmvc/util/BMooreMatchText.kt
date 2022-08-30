@@ -1,4 +1,4 @@
-package internlabs.dependencyinjection.notepadmvc.controller.findUtil
+package internlabs.dependencyinjection.notepadmvc.util
 
 class BMooreMatchText {
     companion object {
