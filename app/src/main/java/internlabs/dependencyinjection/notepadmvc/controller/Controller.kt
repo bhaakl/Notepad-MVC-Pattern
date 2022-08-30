@@ -1,7 +1,9 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.ClipboardManager
+import android.content.ContentValues
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -10,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
@@ -22,7 +25,7 @@ import java.io.*
 
 //-
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
-    NavigationView.OnNavigationItemSelectedListener {
+    NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener {
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
 
@@ -30,6 +33,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         this.viewer = viewer
     }
 
+    // DrawerLayout click handler
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.openFile -> {
@@ -82,6 +86,61 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         item.isChecked = true
         viewer.getDrawerLayout().close()
         return true
+    }
+
+    // bottomAppBar click handler
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+       return when (item?.itemId) {
+            R.id.more -> {
+                viewer.getDrawerLayout().open()
+                true
+            }
+            R.id.printDocumentBtm -> {
+                print()
+                true
+            }
+            R.id.saveAsBtm -> {
+                saveAs()
+                viewer.getUndoRedoManager().clearHistory()
+                true
+            }
+            R.id.openFileBtm -> {
+                open()
+                viewer.getUndoRedoManager().clearHistory()
+                true
+            }
+            R.id.saveBtm -> {
+                save()
+                viewer.getUndoRedoManager().clearHistory()
+                true
+            }
+           R.id.newFileBtm -> {
+               new()
+               viewer.getUndoRedoManager().clearHistory()
+               true
+           }
+           R.id.searchBtm -> {
+               find()
+               true
+           }
+           R.id.redoBtm -> {
+               redo()
+               true
+           }
+           R.id.undoBtm -> {
+               undo()
+               true
+           }
+           R.id.pasteBtm -> {
+               paste(item)
+               true
+           }
+           R.id.copyBtm -> {
+               copy()
+               true
+           }
+            else -> false
+        }
     }
 
     override fun new() {
@@ -357,11 +416,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun onClick(v: View) {
-        when (v.id) {
+        /*when (v.id) {
             R.id.editText -> {
                 viewer.keyBoardShow()
             }
-        }
+        }*/
     }
 
 

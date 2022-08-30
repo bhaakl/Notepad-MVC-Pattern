@@ -1,11 +1,13 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
@@ -28,6 +30,9 @@ class Viewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        //in landscape mode hide bottomAppBar
+        binding.bottomAppBar.isVisible =
+            resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
         initListeners()
     }
 
@@ -39,12 +44,22 @@ class Viewer : AppCompatActivity() {
 
         navigationView.setNavigationItemSelectedListener(controller)
 
+        bottomAppBar.setOnMenuItemClickListener(controller)
+
         undoRedoManager = TextUndoRedo(binding.editText)
         undoRedoManager.setMaxHistorySize(1000)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        undoRedoManager.clearHistory()
+        undoRedoManager.disconnect()
+        close()
+    }
+
     /**
-     * @param setSelection  переносит курсор в конец строки у edit text
+     * setSelection: переносит курсор в конец строки у edit text
      */
     fun setTextFromFile(string: String) {
         getEditText().setText(string)
@@ -110,14 +125,6 @@ class Viewer : AppCompatActivity() {
     fun keyBoardShow() {
         // убирает клавиатуру
         getEditText().onEditorAction(EditorInfo.IME_ACTION_DONE)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        undoRedoManager.clearHistory()
-        undoRedoManager.disconnect()
-        close()
     }
 
     fun makeEditTextEditable() {

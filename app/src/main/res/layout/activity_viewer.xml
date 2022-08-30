@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true" >
 
-
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/imageMenu"
                 style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
@@ -30,11 +29,10 @@
                 app:navigationIcon="@drawable/ic_menu_24dp"
                 app:title="@string/app_name" />
 
-
         </com.google.android.material.appbar.AppBarLayout>
 
-
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -45,13 +43,33 @@
                 android:layout_height="match_parent"
                 android:autofillHints="false"
                 android:background="@color/white"
-                android:gravity="top|left"
                 android:enabled="false"
+                android:gravity="top|left"
                 android:inputType="textMultiLine"
                 android:maxLength="6000000"
                 tools:ignore="LabelFor,RtlHardcoded" />
 
         </androidx.core.widget.NestedScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"
+            android:fitsSystemWindows="true"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.bottomappbar.BottomAppBar
+                android:id="@+id/bottomAppBar"
+                style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                app:hideOnScroll="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:menu="@menu/bottom_app_bar"
+                app:menuAlignmentMode="start"
+                tools:ignore="BottomAppBar,MissingConstraints" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -23,4 +23,8 @@
     <string name="print">Print</string>
     <string name="delete">Delete</string>
     <string name="select_all">Select all</string>
+    <string name="content_description_search">Find</string>
+    <string name="content_description_more">See more</string>
+    <string name="content_description_print">Print document</string>
+    <string name="more">Show more</string>
 </resources>

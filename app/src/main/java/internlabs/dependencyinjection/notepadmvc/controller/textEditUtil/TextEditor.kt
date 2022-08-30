@@ -40,7 +40,6 @@ class TextEditor {
 
         fun paste(clipboardManager: ClipboardManager, pasteItem: MenuItem): String {
             var pasteData: String = ""
-
             // Если в буфере обмена нет данных, отключаем пункт меню вставки.
             // Если он содержит данные, решите, можете ли вы обрабатывать данные.
             pasteItem.isEnabled = when {
