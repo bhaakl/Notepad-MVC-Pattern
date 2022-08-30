@@ -173,6 +173,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun paste(pasteItem: MenuItem): Boolean {
+        viewer.makeEditTextEditable() //TODO
         val clipboard =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         var pasteData: String = ""
@@ -334,7 +335,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     private fun contentIsNormal(content: String): Boolean {
         content.forEach {
-            println(".....$it")
             if (it != ' ' && it != '\n') return true
         }
         return false

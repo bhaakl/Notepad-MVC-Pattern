@@ -3,11 +3,13 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isInvisible
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
@@ -127,6 +129,7 @@ class Viewer : AppCompatActivity() {
     fun makeEditTextEditable() {
         binding.editText.isEnabled = true
         binding.editText.isFocusable = true
+        binding.editText.isInvisible = false
     }
 
     fun showToast(s: String) {
@@ -135,15 +138,11 @@ class Viewer : AppCompatActivity() {
 
     fun getFonts() : Paint {
         val paint = Paint()
-        paint.textSize = binding.editText.textSize
-        println("binding.editText.textSize   ${binding.editText.textSize}")
+        val spSize = binding.editText.textSize
+        paint.textSize = spSize / 100 * 80
         paint.letterSpacing = binding.editText.letterSpacing
-        println("binding.editText.letterSpacing   ${binding.editText.letterSpacing}")
-        //paint.textAlign = Paint.Align.CENTER//binding.editText.textAlignment
         paint.typeface = Typeface.create(binding.editText.typeface, getTypeface())
-        println("binding.editText.typeface, getTypeface()     ${binding.editText.typeface}     ${getTypeface()}")
         paint.color = binding.editText.currentTextColor
-        println("binding.editText.currentTextColor      ${binding.editText.currentTextColor}")
         return paint
     }
 
