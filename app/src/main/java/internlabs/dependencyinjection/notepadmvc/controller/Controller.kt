@@ -1,6 +1,5 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
-import android.annotation.SuppressLint
 import android.content.*
 import android.net.Uri
 import android.os.Build
@@ -113,26 +112,31 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 uri = uri1
                 viewer.makeEditTextEditable()
             } else {
-                viewer.showToast("Файл не поддерживается!")
+                viewer.showToast("File extension is not supported")
             }
         }
     }
 
     private fun getText(context: Context, uri: Uri?): ByteArray? {
-        var inputStream: InputStream? = null // TODO Stream нельзя использовать
+        val inputStream: InputStream?
         return try {
             inputStream =
-                context.contentResolver.openInputStream(uri!!) // TODO Stream нельзя использовать
-            val outputStream = ByteArrayOutputStream() // TODO Stream нельзя использовать
+                context.contentResolver.openInputStream(uri!!)
+            val outputStream = ByteArrayOutputStream()
             val bufferSize = 1024
             val buffer = ByteArray(bufferSize)
             var len = 0
             while (inputStream!!.read(buffer)
                     .also { len = it } != -1
-            ) { // TODO Stream нельзя использовать
-                outputStream.write(buffer, 0, len) // TODO Stream нельзя использовать
+            ) {
+                outputStream.write(buffer, 0, len)
             }
-            outputStream.toByteArray() // TODO Stream нельзя использовать
+            inputStream.close()
+            with(outputStream) {
+                flush()
+                close()
+                toByteArray()
+            }
         } catch (ex: Exception) {
             Log.e("Error", ex.message.toString())
             viewer.showToast("getText error: ${ex.message}")
@@ -190,7 +194,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             viewer.showToast("Deleted")
     }
 
-    @SuppressLint("InflateParams")
     override fun find() {
         val inflater: LayoutInflater = LayoutInflater.from(viewer)
         val view: View = inflater.inflate(R.layout.feature_find, null)
@@ -336,7 +339,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             printDocument.doPrint()
         }
         else {
-            viewer.showToast("Документ пустой!")
+            viewer.showToast("Document is empty")
         }
     }
 
@@ -398,7 +401,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
             }
         } catch (e: FileNotFoundException) {
-            println("нетуу")
+            viewer.showToast("File not found")
         } catch (e: IOException) {
             e.printStackTrace()
         }
