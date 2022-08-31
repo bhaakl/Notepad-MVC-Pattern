@@ -45,7 +45,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
         private var myPdfDocument: PdfDocument? = null
         private var totalPages = 2
         private var titleBaseline = 1
-        private val leftMargin = 1
+        private val leftMargin = 20
         private var textHeight = 39
         private var itemsPerPage = 0
 
@@ -70,6 +70,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             }
             makeCorrectLines()
             totalPages = computePageCount()
+            println("totalPage    $totalPages")
 
             if (cancellationSignal.isCanceled) {
                 callback.onLayoutCancelled()
@@ -91,9 +92,9 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
 
         private fun makeCorrectLines() {
             for (index in stringLines.indices) {
-                if (fonts.measureText(stringLines[index]).toInt() > pageWidth) {
+                if (fonts.measureText(stringLines[index]).toInt() > (pageWidth-30)) {
                     rawString = stringLines[index]
-                    while (fonts.measureText(rawString).toInt() > pageWidth) {
+                    while (fonts.measureText(rawString).toInt() > (pageWidth-30)) {
                         newLine(rawString)
                     }
                     finalStringLines.add(rawString)
@@ -169,6 +170,9 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             }*/
 
             // Determine number of print items
+            println(itemsPerPage)
+            println(finalStringLines.size)
+
             val printItemCount: Int = finalStringLines.size
             return ceil((printItemCount / itemsPerPage.toDouble())).toInt()
         }
@@ -177,7 +181,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             var tmp = ""
             beforeLast.forEach {
                 tmp += it.toString()
-                if (fonts.measureText(tmp).toInt() > (pageWidth - 40)) {
+                if (fonts.measureText(tmp).toInt() > (pageWidth - 70)) {
                     finalStringLines.add("$tmp -")
                     tmp = ""
                 }
@@ -194,7 +198,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             } else {
                 s
             }
-            if (fonts.measureText(beforeLast).toInt() > pageWidth) {
+            if (fonts.measureText(beforeLast).toInt() > (pageWidth-30)) {
                 if (beforeLast.contains(' ')) {
                     newLine(beforeLast)
                 } else {
@@ -225,8 +229,13 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
                 if (maxItem == itemsPerPage) {
                     break
                 }
-                canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
-                    (textHeight * titleBaseline).toFloat(), fonts)
+                if (i == 0){
+                    canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
+                        textHeight+30f, fonts)
+                } else {
+                    canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
+                        ((textHeight + 15f) * titleBaseline).toFloat(), fonts)
+                }
                 index++
                 maxItem++
                 titleBaseline++

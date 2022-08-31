@@ -138,7 +138,7 @@ class Viewer : AppCompatActivity() {
     fun getFonts() : Paint {
         val paint = Paint()
         val spSize = binding.editText.textSize
-        paint.textSize = spSize / 100 * 80
+        paint.textSize = spSize / 100 * 75
         paint.letterSpacing = binding.editText.letterSpacing
         paint.typeface = Typeface.create(binding.editText.typeface, getTypeface())
         paint.color = binding.editText.currentTextColor

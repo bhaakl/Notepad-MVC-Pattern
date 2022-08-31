@@ -36,6 +36,20 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
+
+        <service
+            android:name=".util.CustomPrintService"
+            android:permission="android.permission.BIND_PRINT_SERVICE"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.printservice.PrintService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.printservice"
+                android:resource="@xml/custom_print_service" />
+        </service>
     </application>
 
 </manifest>
