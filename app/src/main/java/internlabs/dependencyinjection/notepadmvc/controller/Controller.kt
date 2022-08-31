@@ -14,24 +14,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.AdapterView
+import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
-
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
-import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
+import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
-
 import java.io.*
 import kotlin.system.exitProcess
+
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
@@ -105,14 +103,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun new() {
         viewer.makeEditTextEditable()
         viewer.setTextFromFile("")
-        val outputFile: String =
+       /* val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
         uri = FileProvider.getUriForFile(
             viewer,
             "internlabs.dependencyinjection.notepadmvc.provider",
             file1
-        )
+        )*/
     }
 
     override fun open() {
@@ -189,6 +187,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun paste(pasteItem: MenuItem) {
+        viewer.makeEditTextEditable()
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         // Gets the clipboard as text.
@@ -332,12 +331,16 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         } else {
             saveToFile(uri)
         }
-        viewer.showToast("File has been saved!")
     }
 
     override fun saveAs() {
-        val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
-        saveAsDoc.launch(u)
+        if (uri == Uri.parse("")){
+            saveAsDoc.launch("Example.ntp")
+        } else {
+            val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
+            saveAsDoc.launch(u)
+        }
+
     }
 
     override fun print() {
@@ -421,23 +424,49 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     //region  Медер Шермаматов
     //-- служебный метод Фильтр для файлов()
     private fun isOk(uri: Uri): Boolean {
-        val fileName = DocumentFile.fromSingleUri(viewer, uri)?.name
-        if (fileName != null) {
-            if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
-                val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
-                if (extensionOfFile == "ntp"
-                    || extensionOfFile == "kt"
-                    || extensionOfFile == "swift"
-                    || extensionOfFile == "java") {
-                    val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
-                    val max = 5629273
-                    if (size != null) {
-                        return size < max
+        val fullFileName = DocumentFile.fromSingleUri(viewer, uri)?.name
+        println(fullFileName)
+        var dotCount = 0
+        fullFileName?.forEach {
+            if (it == '.'){
+                dotCount++
+            }
+        }
+        if (fullFileName != null && dotCount == 1) {
+            if (fullFileName.lastIndexOf(".") != -1 && fullFileName.lastIndexOf(".") != 0) {
+                var extensionOfFile = fullFileName.substring(fullFileName.lastIndexOf(".") + 1)
+                extensionOfFile = extensionOfFile.substringBefore(" ")
+                val fileName = fullFileName.substringBefore(".")
+                println(extensionOfFile)
+                println(isCorrectName(fileName))
+                if (isCorrectName(fileName)) {
+                    if (extensionOfFile == "ntp"
+                        || extensionOfFile == "kt"
+                        || extensionOfFile == "swift"
+                        || extensionOfFile == "java") {
+                        val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
+                        val max = 5629273
+                        if (size != null) {
+                            return size < max
+                        }
                     }
                 }
             }
         }
         return false
+    }
+
+    private fun isCorrectName(fileName: String): Boolean {
+        fileName.forEach {
+            val int: Int = it.code.toInt()
+            println("int    $int")
+            if (int in 65..90 || int in 97..122){
+                println("..............")
+            } else {
+                return false
+            }
+        }
+        return true
     }
 
     // -- служебный метод Сохранение в файл()
@@ -451,6 +480,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                     fos.close()
                 }
             }
+            viewer.showToast("File has been saved!")
         } catch (e: FileNotFoundException) {
             viewer.showToast("File not found!")
         } catch (e: IOException) {
@@ -469,10 +499,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 uri = it
                 viewer.setTextFromFile("")
             } else {
-                viewer.showToast("File extension is not supported!")
+                DocumentFile.fromSingleUri(viewer, it)?.delete()
+                viewer.showToast("File extension is not supported! ")
             }
         }
-
     }
     //endregion
 
