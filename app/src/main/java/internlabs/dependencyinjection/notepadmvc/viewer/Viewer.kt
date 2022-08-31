@@ -55,7 +55,6 @@ class Viewer : AppCompatActivity() {
 
         undoRedoManager = TextUndoRedo(binding.editText)
         undoRedoManager.setMaxHistorySize(1000)
-        editText.add
     }
 
     /**

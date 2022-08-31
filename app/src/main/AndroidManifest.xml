@@ -18,7 +18,7 @@
         <activity
             android:name=".viewer.Viewer"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,18 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-       <!-- <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>-->
-        </provider>
-
 
         <service
             android:name=".util.CustomPrintService"
@@ -49,7 +37,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.printservice"
-                android:resource="@xml/custom_print_service" />
+                android:resource = "@xml/custom" />
         </service>
     </application>
 

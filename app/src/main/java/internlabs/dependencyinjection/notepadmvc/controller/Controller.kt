@@ -103,14 +103,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun new() {
         viewer.makeEditTextEditable()
         viewer.setTextFromFile("")
-       /* val outputFile: String =
-            viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
-        val file1 = File(outputFile)
-        uri = FileProvider.getUriForFile(
-            viewer,
-            "internlabs.dependencyinjection.notepadmvc.provider",
-            file1
-        )*/
     }
 
     override fun open() {
@@ -189,9 +181,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun paste(pasteItem: MenuItem) {
         viewer.makeEditTextEditable()
         val clipboardManager =
-    override fun paste(pasteItem: MenuItem): Boolean {
-        viewer.makeEditTextEditable() //TODO
-        val clipboard =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         // Gets the clipboard as text.
         val pasteData = TextEditor.paste(clipboardManager, pasteItem)
@@ -364,10 +353,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         return false
     }
 
-    override fun recent() {
-        TODO("Not yet implemented")
-    }
-
     override fun aboutApp() {
         dialog = Dialog(viewer)
         dialog.setContentView(R.layout.dialog_layout)
@@ -475,7 +460,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             val int: Int = it.code.toInt()
             println("int    $int")
             if (int in 65..90 || int in 97..122){
-                println("..............")
+                println("")
             } else {
                 return false
             }
