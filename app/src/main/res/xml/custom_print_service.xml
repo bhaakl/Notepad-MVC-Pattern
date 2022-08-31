@@ -1,0 +1,4 @@
+<print-service android:label="TransferPrintService"
+    android:vendor="Company Ltd."
+
+    xmlns:android="http://schemas.android.com/apk/res/android" />
