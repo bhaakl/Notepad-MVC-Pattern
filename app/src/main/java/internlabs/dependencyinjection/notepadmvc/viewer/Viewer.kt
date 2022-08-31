@@ -2,7 +2,6 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
@@ -13,7 +12,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
-import java.util.*
 
 
 class Viewer : AppCompatActivity() {
