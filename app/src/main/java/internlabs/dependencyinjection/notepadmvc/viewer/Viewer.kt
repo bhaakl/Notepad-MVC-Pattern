@@ -41,11 +41,13 @@ class Viewer : AppCompatActivity() {
             drawerLayout.open()
             editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
         }
+        editText.breakStrategy = editText.width-30
 
         navigationView.setNavigationItemSelectedListener(controller)
 
         undoRedoManager = TextUndoRedo(binding.editText)
         undoRedoManager.setMaxHistorySize(1000)
+        editText.add
     }
 
     /**
@@ -138,11 +140,30 @@ class Viewer : AppCompatActivity() {
     fun getFonts() : Paint {
         val paint = Paint()
         val spSize = binding.editText.textSize
-        paint.textSize = spSize / 100 * 75
+        paint.textAlign = getTextAlignment()
+        paint.textSize = spSize / 100 * 74
+        paint.textLocale = binding.editText.textLocale
         paint.letterSpacing = binding.editText.letterSpacing
         paint.typeface = Typeface.create(binding.editText.typeface, getTypeface())
         paint.color = binding.editText.currentTextColor
         return paint
+    }
+
+    private fun getTextAlignment(): Paint.Align {
+        when(binding.editText.textAlignment){
+            View.TEXT_ALIGNMENT_TEXT_START -> return Paint.Align.LEFT
+            View.TEXT_ALIGNMENT_CENTER -> return Paint.Align.CENTER
+            View.TEXT_ALIGNMENT_TEXT_END -> return Paint.Align.RIGHT
+            View.TEXT_ALIGNMENT_GRAVITY -> {
+                println("There is no corresponding in Paint.Align")
+            }
+            View.TEXT_ALIGNMENT_INHERIT -> {
+                println("There is no corresponding in Paint.Align")
+            }
+            View.TEXT_ALIGNMENT_VIEW_END -> return Paint.Align.RIGHT
+            View.TEXT_ALIGNMENT_VIEW_START -> return Paint.Align.LEFT
+        }
+        return Paint.Align.LEFT
     }
 
     private fun getTypeface(): Int {

@@ -29,6 +29,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
             val newAttributes =
                 PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                    .setMinMargins(PrintAttributes.Margins(30, 35, 30, 30))
                     .build()
             val jobName = "NotepadMVC Document"
             printManager.print(jobName, MyPrintDocumentAdapter(context), newAttributes)
@@ -38,14 +39,14 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
 
     inner class MyPrintDocumentAdapter(private var context: Context) : PrintDocumentAdapter() {
         private var rawString = ""
-        private val stringLines: List<String> = text.lines()
-        private val finalStringLines = mutableListOf<String>()
+        private var stringLines: List<String> = text.lines()
+        private var finalStringLines = mutableListOf<String>()
         private var pageHeight: Int = 0
         private var pageWidth: Int = 0
         private var myPdfDocument: PdfDocument? = null
         private var totalPages = 2
         private var titleBaseline = 1
-        private val leftMargin = 20
+        private var leftMargin = 30
         private var textHeight = 39
         private var itemsPerPage = 0
 
@@ -92,9 +93,9 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
 
         private fun makeCorrectLines() {
             for (index in stringLines.indices) {
-                if (fonts.measureText(stringLines[index]).toInt() > (pageWidth-30)) {
+                if (fonts.measureText(stringLines[index]).toInt() > (pageWidth-35)) {
                     rawString = stringLines[index]
-                    while (fonts.measureText(rawString).toInt() > (pageWidth-30)) {
+                    while (fonts.measureText(rawString).toInt() > (pageWidth-35)) {
                         newLine(rawString)
                     }
                     finalStringLines.add(rawString)
@@ -138,18 +139,8 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             } finally {
                 myPdfDocument?.close()
                 myPdfDocument = null
-                /*rawString = ""
-                stringLines
+                stringLines = emptyList()
                 finalStringLines.clear()
-                pageHeight = null
-                pageWidth: Int =
-                myPdfDocument: Pd
-                totalPages = 2
-                titleBaseline = 1
-                leftMargin = 1
-                textHeight = 39
-                itemsPerPage = 0
-*/
             }
             callback.onWriteFinished(pageRanges)
 
@@ -159,9 +150,9 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             val bounds = Rect()
 
             fonts.getTextBounds(text, 0, text.length, bounds)
-            textHeight = bounds.height()
+            textHeight = bounds.height()-4
             val printArea = pageHeight - titleBaseline * 2
-            itemsPerPage = printArea / (textHeight + 1) // default item count for portrait mode
+            itemsPerPage = printArea / (textHeight + 16) // default item count for portrait mode
             /*if (pageSize != null) {
                 if (!pageSize.isPortrait) {
                     // Six items per page in landscape orientation
@@ -192,13 +183,12 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
         }
 
         private fun newLine(s: String) {
-            var beforeLast = ""
-            beforeLast = if (s.contains(' ')) {
+            val beforeLast: String = if (s.contains(' ')) {
                 s.substringBeforeLast(' ')
             } else {
                 s
             }
-            if (fonts.measureText(beforeLast).toInt() > (pageWidth-30)) {
+            if (fonts.measureText(beforeLast).toInt() > (pageWidth-35)) {
                 if (beforeLast.contains(' ')) {
                     newLine(beforeLast)
                 } else {
@@ -224,20 +214,26 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             val canvas = page.canvas
             var maxItem = 0
             titleBaseline = 1
+            println("item count   $itemsPerPage")
 
             for (i in index until finalStringLines.size) {
                 if (maxItem == itemsPerPage) {
                     break
                 }
                 if (i == 0){
+                    canvas.drawText("", leftMargin.toFloat(),
+                        ((textHeight) * titleBaseline).toFloat(), fonts)
+                    titleBaseline++
+                    titleBaseline++
                     canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
-                        textHeight+30f, fonts)
+                        ((textHeight) * titleBaseline).toFloat(), fonts)
                 } else {
                     canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
-                        ((textHeight + 15f) * titleBaseline).toFloat(), fonts)
+                        ((textHeight) * titleBaseline).toFloat(), fonts)
                 }
                 index++
                 maxItem++
+                titleBaseline++
                 titleBaseline++
             }
 
