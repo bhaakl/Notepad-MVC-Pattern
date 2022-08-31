@@ -5,24 +5,37 @@ import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Color
+import android.app.Dialog
+import android.content.*
+import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
+import android.widget.AdapterView
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
+
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
+import kotlin.system.exitProcess
 
 //-
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
@@ -56,8 +69,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.getUndoRedoManager().clearHistory()
             }
             R.id.about_app -> {
-                viewer.showAlertDialog()
+                aboutApp()
             }
+
+            R.id.exit -> {
+                exit()
+            }
+
             R.id.copy -> {
                 copy()
             }
@@ -331,7 +349,27 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun size() {
-        TODO("Not yet implemented")
+
+        val editText = viewer.getEditText()
+        val spinner = viewer.findViewById<Spinner>(R.id.spinner)
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                when (spinner.selectedItemPosition) {
+                    1 -> editText.textSize = 20f
+                    2 -> editText.textSize = 25f
+                    3 -> editText.textSize = 30f
+                    4 -> editText.textSize = 35f
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+
     }
 
     override fun fontFamily() {
@@ -339,19 +377,36 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun makeBold() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(StyleSpan(Typeface.BOLD),
+            editText.selectionStart,
+            editText.selectionEnd,
+            0)
+        editText.text = spannableString
     }
 
     override fun makeItalic() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeCursive() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(StyleSpan(Typeface.ITALIC),
+            editText.selectionStart,
+            editText.selectionEnd,
+            0)
+        editText.text = spannableString
     }
 
     override fun makeUnderlined() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(UnderlineSpan(), editText.selectionStart, editText.selectionEnd, 0)
+        editText.text = spannableString
+    }
+
+    override fun makeRegularFormat() {
+        val editText = viewer.getEditText()
+        val stringText :String = editText.text.toString()
+        editText.setText(stringText)
     }
 
     override fun makeCrossedOut() {
@@ -375,15 +430,24 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun alignLeft() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
     override fun alignRight() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_END
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
-    override fun alignLeftAndLeft() {
-        TODO("Not yet implemented")
+    override fun alignCenter() {
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
     override fun lineSpace() {
@@ -423,7 +487,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun aboutApp() {
-        TODO("Not yet implemented")
+        dialog = Dialog(viewer)
+        dialog.setContentView(R.layout.dialog_layout)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
     }
 
     override fun sentToEmail() {
@@ -431,17 +498,64 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun exit() {
-        TODO("Not yet implemented")
+        val alertDialog = AlertDialog.Builder(viewer)
+        alertDialog.setTitle("Exit")
+            .setMessage(" Do you want to exit? ")
+            .setCancelable(true)
+            .setPositiveButton(" Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
+            .setNegativeButton(" Yes") { _, _ ->
+                 exitProcess(0)
+           // viewer.finish()
+            }
+        alertDialog.show()
     }
 
     override fun onClick(v: View) {
-        /*when (v.id) {
+        when (v.id) {
             R.id.editText -> {
                 viewer.keyBoardShow()
             }
-        }*/
-    }
 
+            R.id.fab -> {
+                viewer.animateFab()
+            }
+
+            R.id.bolt -> {
+                viewer.animateFab()
+                makeBold()
+            }
+
+            R.id.italic -> {
+                viewer.animateFab()
+                makeItalic()
+            }
+
+            R.id.underline -> {
+                viewer.animateFab()
+                makeUnderlined()
+            }
+
+            R.id.no_format -> {
+                viewer.animateFab()
+                makeRegularFormat()
+            }
+
+            R.id.align_left -> {
+                viewer.animateFab()
+                alignLeft()
+            }
+
+            R.id.align_right -> {
+                viewer.animateFab()
+                alignRight()
+            }
+
+            R.id.align_center -> {
+                viewer.animateFab()
+                alignCenter()
+            }
+        }
+    }
 
     //region  Медер Шермаматов
     //-- служебный метод Фильтр для файлов()
@@ -465,7 +579,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
         return false
     }
-
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
         val text = viewer.getEditText().text.toString()
@@ -478,7 +591,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 }
             }
         } catch (e: FileNotFoundException) {
-            println("нетуу")
+            viewer.showToast("File not found!")
         } catch (e: IOException) {
             e.printStackTrace()
         }
