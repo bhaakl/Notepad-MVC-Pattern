@@ -1,26 +1,41 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
+import android.app.Dialog
 import android.content.*
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.FileProvider
+import androidx.appcompat.app.AlertDialog
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
+import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
+import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
+import kotlin.system.exitProcess
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
-
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
+    private lateinit var dialog: Dialog
 
     init {
         this.viewer = viewer
@@ -45,10 +60,15 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.getUndoRedoManager().clearHistory()
             }
             R.id.about_app -> {
-                viewer.showAlertDialog()
+                aboutApp()
             }
+
+            R.id.exit -> {
+                exit()
+            }
+
             R.id.copy -> {
-                copy("")
+                copy()
             }
             R.id.paste -> {
                 paste(item)
@@ -56,14 +76,23 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             R.id.cut -> {
                 cut()
             }
-            R.id.printDocument ->{
-                print()
+            R.id.delete -> {
+                delete()
+            }
+            R.id.select_all -> {
+                selectAll()
             }
             R.id.undo -> {
                 undo()
             }
+            R.id.printDocument -> {
+                print()
+            }
             R.id.redo -> {
                 redo()
+            }
+            R.id.searchText -> {
+                find()
             }
         }
         item.isChecked = true
@@ -74,14 +103,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun new() {
         viewer.makeEditTextEditable()
         viewer.setTextFromFile("")
-        val outputFile: String =
+       /* val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
         uri = FileProvider.getUriForFile(
             viewer,
             "internlabs.dependencyinjection.notepadmvc.provider",
             file1
-        )
+        )*/
     }
 
     override fun open() {
@@ -100,7 +129,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 uri = uri1
                 viewer.makeEditTextEditable()
             } else {
-                viewer.showToast("Файл не поддерживается!")
+                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
             }
         }
     }
@@ -142,184 +171,179 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun cut() {
-        val startSelection: Int = viewer.getEditText().selectionStart
-        val endSelection: Int = viewer.getEditText().selectionEnd
-        val selectedText: String = viewer.getEditText().text.toString()
-            .substring(startSelection, endSelection)
-
-        copy(selectedText)
-        viewer.getEditText().text =
-            viewer.getEditText().text.replace(startSelection, endSelection, "")
-        viewer.getEditText().setSelection(startSelection)
-        //viewer.toastCut()
-        viewer.showToast("Cut Out")
-    }
-
-    override fun copy(textCopied: String) {
-        val startSelection: Int = viewer.getEditText().selectionStart
-        val endSelection: Int = viewer.getEditText().selectionEnd
-        val cTextCopied: String = viewer.getEditText().text.toString()
-        .substring(startSelection, endSelection)
-
-        println("selected text: $cTextCopied")
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("", cTextCopied))
-        // Only show a toast for Android 12 and lower.
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-            //viewer.toastCopied()
-            viewer.showToast("Copied")
-        viewer.getEditText().setSelection(viewer.getEditText().selectionEnd)
+        if (TextEditor.cut(viewer.getEditText(), clipboardManager))
+            viewer.showToast("Cut Out")
     }
 
+    override fun copy() {
+        val clipboardManager =
+            viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        if (TextEditor.copy(viewer.getEditText(), clipboardManager))
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+                viewer.showToast("Copied")
+
+    }
+
+    override fun paste(pasteItem: MenuItem) {
+        viewer.makeEditTextEditable()
+        val clipboardManager =
     override fun paste(pasteItem: MenuItem): Boolean {
         viewer.makeEditTextEditable() //TODO
         val clipboard =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        var pasteData: String = ""
-
-        // Если в буфере обмена нет данных, отключаем пункт меню вставки.
-        // Если он содержит данные, решите, можете ли вы обрабатывать данные.
-        pasteItem.isEnabled = when {
-            !clipboard.hasPrimaryClip() -> {
-                false
-            }
-            !(clipboard.primaryClipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN))!! -> {
-                // Это отключает пункт меню вставки, так как в буфере обмена есть данные, но это не обычный текст
-                false
-            }
-            else -> {
-                // Это включает пункт меню вставки, так как буфер обмена содержит обычный текст.
-                true
-            }
-        }
-        val item = clipboard.primaryClip?.getItemAt(0)
-
         // Gets the clipboard as text.
-        pasteData = item?.text.toString()
-        println("PASTED text: $pasteData")
-        return if (pasteData.isNotEmpty()) {
+        val pasteData = TextEditor.paste(clipboardManager, pasteItem)
+        if (pasteData.isNotEmpty()) {
             // Если строка содержит данные, то выполняется операция вставки
             viewer.setTextForEditor(pasteData)
-            //viewer.toastPasted()
-            //viewer.showToast("Pasted")
-            true
+            viewer.showToast("Pasted")
         } else {
             // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
             // содержат текст. Сообщить об ошибке.
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
-            false
         }
     }
 
     override fun delete() {
-        TODO("Not yet implemented")
+        if(TextEditor.delete(viewer.getEditText()))
+            viewer.showToast("Deleted")
     }
 
     override fun find() {
-        TODO("Not yet implemented")
-    }
+        val inflater: LayoutInflater = LayoutInflater.from(viewer)
+        val view: View = inflater.inflate(R.layout.feature_find, null)
+        val mBuilder = AlertDialog.Builder(viewer)
+            .setTitle("Find")
+            .setIcon(R.drawable.ic_search_in)
+            .setView(view)
+            .setPositiveButton("Find next", null)
+            .setNegativeButton("Cancel", null)
+            .setCancelable(true)
+            .show()
 
-    override fun replace() {
-        TODO("Not yet implemented")
+        val mPositiveButton = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
+        val editTextFind = view.findViewById<EditText>(R.id.findWhat)
+
+        var posD = 0
+        mPositiveButton.setOnClickListener {
+            if (viewer.getEditText().text.isNotEmpty()) {
+                val matchingAnswer = BMooreMatchText.search(
+                    viewer.getEditText().text.toString().toCharArray(),
+                    editTextFind.text.toString().toCharArray()
+                )
+                if (matchingAnswer.isNotEmpty()) {
+                    if (posD == matchingAnswer.size || posD > matchingAnswer.size ) posD = 0
+                    val edFind = editTextFind.text.toString()
+                    viewer.getEditText().setSelection(
+                        matchingAnswer[posD++],
+                        matchingAnswer[posD - 1] + edFind.length
+                    )
+                } else
+                    viewer.showToast("'${editTextFind.text}' not found!")
+            } else
+                viewer.showToast("Text empty!")
+        }
     }
 
     override fun selectAll() {
-        TODO("Not yet implemented")
-    }
-
-    override fun dateAndTime() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomIn() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomOut() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomDefault() {
-        TODO("Not yet implemented")
+        viewer.getEditText().selectAll()
     }
 
     override fun size() {
-        TODO("Not yet implemented")
-    }
+        val editText = viewer.getEditText()
+        val spinner = viewer.findViewById<Spinner>(R.id.spinner)
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                when (spinner.selectedItemPosition) {
+                    1 -> editText.textSize = 20f
+                    2 -> editText.textSize = 25f
+                    3 -> editText.textSize = 30f
+                    4 -> editText.textSize = 35f
+                }
+            }
 
-    override fun fontFamily() {
-        TODO("Not yet implemented")
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+
     }
 
     override fun makeBold() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(StyleSpan(Typeface.BOLD),
+            editText.selectionStart,
+            editText.selectionEnd,
+            0)
+        editText.text = spannableString
     }
 
     override fun makeItalic() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeCursive() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(StyleSpan(Typeface.ITALIC),
+            editText.selectionStart,
+            editText.selectionEnd,
+            0)
+        editText.text = spannableString
     }
 
     override fun makeUnderlined() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(UnderlineSpan(), editText.selectionStart, editText.selectionEnd, 0)
+        editText.text = spannableString
     }
 
-    override fun makeCrossedOut() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeSubscript() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeSuperscript() {
-        TODO("Not yet implemented")
-    }
-
-    override fun textColor() {
-        TODO("Not yet implemented")
-    }
-
-    override fun textBackground() {
-        TODO("Not yet implemented")
+    override fun makeRegularFormat() {
+        val editText = viewer.getEditText()
+        val stringText :String = editText.text.toString()
+        editText.setText(stringText)
     }
 
     override fun alignLeft() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
     override fun alignRight() {
-        TODO("Not yet implemented")
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_END
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
-    override fun alignLeftAndLeft() {
-        TODO("Not yet implemented")
-    }
-
-    override fun lineSpace() {
-        TODO("Not yet implemented")
-    }
-
-    override fun letterSpace() {
-        TODO("Not yet implemented")
-    }
-
-    override fun changeTheme() {
-        TODO("Not yet implemented")
+    override fun alignCenter() {
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
     }
 
     override fun save() {
-        saveToFile(uri)
-        viewer.showToast("File has been saved!")
+        if (uri == Uri.parse("")){
+            saveAs()
+        } else {
+            saveToFile(uri)
+        }
     }
 
     override fun saveAs() {
-        val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
-        saveAsDoc.launch(u)
+        if (uri == Uri.parse("")){
+            saveAsDoc.launch("Example.ntp")
+        } else {
+            val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
+            saveAsDoc.launch(u)
+        }
+
     }
 
     override fun print() {
@@ -345,15 +369,23 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun aboutApp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun sentToEmail() {
-        TODO("Not yet implemented")
+        dialog = Dialog(viewer)
+        dialog.setContentView(R.layout.dialog_layout)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
     }
 
     override fun exit() {
-        TODO("Not yet implemented")
+        val alertDialog = AlertDialog.Builder(viewer)
+        alertDialog.setTitle("Exit")
+            .setMessage(" Do you want to exit? ")
+            .setCancelable(true)
+            .setPositiveButton(" Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
+            .setNegativeButton(" Yes") { _, _ ->
+                exitProcess(0)
+                // viewer.finish()
+            }
+        alertDialog.show()
     }
 
     override fun onClick(v: View) {
@@ -361,31 +393,96 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             R.id.editText -> {
                 viewer.keyBoardShow()
             }
+
+            R.id.fab -> {
+                viewer.animateFab()
+            }
+
+            R.id.bolt -> {
+                viewer.animateFab()
+                makeBold()
+            }
+
+            R.id.italic -> {
+                viewer.animateFab()
+                makeItalic()
+            }
+
+            R.id.underline -> {
+                viewer.animateFab()
+                makeUnderlined()
+            }
+
+            R.id.no_format -> {
+                viewer.animateFab()
+                makeRegularFormat()
+            }
+
+            R.id.align_left -> {
+                viewer.animateFab()
+                alignLeft()
+            }
+
+            R.id.align_right -> {
+                viewer.animateFab()
+                alignRight()
+            }
+
+            R.id.align_center -> {
+                viewer.animateFab()
+                alignCenter()
+            }
         }
     }
-
 
     //region  Медер Шермаматов
     //-- служебный метод Фильтр для файлов()
     private fun isOk(uri: Uri): Boolean {
-        val fileName = DocumentFile.fromSingleUri(viewer, uri)?.name
-        if (fileName != null) {
-            if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
-                val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
-                if (extensionOfFile == "ntp"
-                    || extensionOfFile == "kt"
-                    || extensionOfFile == "swift"
-                    || extensionOfFile == "java") {
-                    val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
-                    val max = 5629273
-                    if (size != null) {
-                        return size < max
+        val fullFileName = DocumentFile.fromSingleUri(viewer, uri)?.name
+        println(fullFileName)
+        var dotCount = 0
+        fullFileName?.forEach {
+            if (it == '.'){
+                dotCount++
+            }
+        }
+        if (fullFileName != null && dotCount == 1) {
+            if (fullFileName.lastIndexOf(".") != -1 && fullFileName.lastIndexOf(".") != 0) {
+                var extensionOfFile = fullFileName.substring(fullFileName.lastIndexOf(".") + 1)
+                extensionOfFile = extensionOfFile.substringBefore(" ")
+                val fileName = fullFileName.substringBefore(".")
+                println(extensionOfFile)
+                println(isCorrectName(fileName))
+                if (isCorrectName(fileName)) {
+                    if (extensionOfFile == "ntp"
+                        || extensionOfFile == "kt"
+                        || extensionOfFile == "swift"
+                        || extensionOfFile == "java") {
+                        val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
+                        val max = 5629273
+                        if (size != null) {
+                            return size < max
+                        }
                     }
                 }
             }
         }
         return false
     }
+
+    private fun isCorrectName(fileName: String): Boolean {
+        fileName.forEach {
+            val int: Int = it.code.toInt()
+            println("int    $int")
+            if (int in 65..90 || int in 97..122){
+                println("..............")
+            } else {
+                return false
+            }
+        }
+        return true
+    }
+
     // -- служебный метод Сохранение в файл()
     private fun saveToFile(uri: Uri) {
         val text = viewer.getEditText().text.toString()
@@ -397,26 +494,104 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                     fos.close()
                 }
             }
+            viewer.showToast("File has been saved!")
         } catch (e: FileNotFoundException) {
-            println("нетуу")
+            viewer.showToast("File not found!")
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
+
     // -- служебный метод Сохранить как()
     private val saveAsDoc = viewer.registerForActivityResult(
         ActivityResultContracts
             .CreateDocument("application/ntp")
     ) {
         if (it != null) {
-            if (isOk(it)){
+            if (isOk(it)) {
                 saveToFile(it)
                 uri = it
                 viewer.setTextFromFile("")
             } else {
-                viewer.showToast("File extension is not supported!")
+                DocumentFile.fromSingleUri(viewer, it)?.delete()
+                viewer.showToast("File extension is not supported! ")
             }
         }
     }
     //endregion
+
+
+
+
+
+
+
+    override fun replace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun dateAndTime() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomIn() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomOut() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomDefault() {
+        TODO("Not yet implemented")
+    }
+
+    override fun fontFamily() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeCrossedOut() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeSubscript() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeSuperscript() {
+        TODO("Not yet implemented")
+    }
+
+    override fun textColor() {
+        TODO("Not yet implemented")
+    }
+
+    override fun textBackground() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeCursive() {
+        TODO("Not yet implemented")
+    }
+
+    override fun lineSpace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun letterSpace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun changeTheme() {
+        TODO("Not yet implemented")
+    }
+
+    override fun recent() {
+        TODO("Not yet implemented")
+    }
+
+    override fun sentToEmail() {
+        TODO("Not yet implemented")
+    }
+
 }

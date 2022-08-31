@@ -4,24 +4,23 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isInvisible
 import androidx.drawerlayout.widget.DrawerLayout
+import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
-import java.util.*
 
 
-// merge
 class Viewer : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
     private var controller: Controller
-    private lateinit var alertDialog: AlertDialog.Builder
+    private var isOpenFab = false
 
     private lateinit var undoRedoManager: TextUndoRedo
 
@@ -44,6 +43,15 @@ class Viewer : AppCompatActivity() {
         editText.breakStrategy = editText.width-30
 
         navigationView.setNavigationItemSelectedListener(controller)
+        fab.setOnClickListener(controller)
+        bolt.setOnClickListener(controller)
+        italic.setOnClickListener(controller)
+        underline.setOnClickListener(controller)
+        noFormat.setOnClickListener(controller)
+        alignLeft.setOnClickListener(controller)
+        alignCenter.setOnClickListener(controller)
+        alignRight.setOnClickListener(controller)
+        controller.size()
 
         undoRedoManager = TextUndoRedo(binding.editText)
         undoRedoManager.setMaxHistorySize(1000)
@@ -54,8 +62,8 @@ class Viewer : AppCompatActivity() {
      * @param setSelection  переносит курсор в конец строки у edit text
      */
     fun setTextFromFile(string: String) {
-        binding.editText.setText(string)
-        binding.editText.setSelection(binding.editText.text.length)
+        getEditText().setText(string)
+        getEditText().setSelection(getEditText().text.length)
     }
 
     /**
@@ -65,43 +73,24 @@ class Viewer : AppCompatActivity() {
      */
     fun setTextForEditor(strAdd: String) {
         if (strAdd.isEmpty() || !binding.editText.isEnabled) { // нельзя выставить пока документ не создан
-            showToast("нельзя выставить текст пока документ не создан")
+            showToast("нельзя вставить текст пока документ не создан")
             return
         }
-        val old = binding.editText.text.toString()
-        val cursor: Int = binding.editText.selectionStart
+        val old = getEditText().text.toString()
+        val cursor: Int = getEditText().selectionStart
         val leftStr = old.substring(0, cursor)
         val rightStr = old.substring(cursor)
-        if (binding.editText.text.isEmpty())
-            binding.editText.setText(strAdd)
+        if (getEditText().text.isEmpty())
+            getEditText().setText(strAdd)
         else
-            binding.editText.setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
-        binding.editText.setSelection(cursor + strAdd.length)
-        showToast("Pasted")
-    }
-
-    fun showAlertDialog() {
-        alertDialog = AlertDialog.Builder(this)
-        alertDialog.setTitle("AboutApp")
-            .setMessage(
-                "Project developers:Notepad MVC pattern\n" +
-                        "Team: Dependency injection\n" +
-                        "Медербек Шермаматов\n" +
-                        "Умут Арпидинов\n" +
-                        "Атабек Шамшидинов\n" +
-                        "Байыш Бегалиев\n" +
-                        "Мурат Жумалиев"
-            )
-            .setCancelable(true)
-            .setPositiveButton("Ok") { dialogInterface, _ ->
-                dialogInterface.cancel()
-            }
-        alertDialog.show()
+            getEditText().setText(String.format("%s%s%s", leftStr, strAdd, rightStr))
+        getEditText().setSelection(cursor + strAdd.length)
     }
 
     fun getUndoRedoManager(): TextUndoRedo {
         return undoRedoManager
     }
+
 
     fun getEditText(): EditText {
         return binding.editText
@@ -111,13 +100,9 @@ class Viewer : AppCompatActivity() {
         return binding.drawerLayout
     }
 
-    private fun close() {
-        binding.drawerLayout.close()
-    }
-
     fun keyBoardShow() {
         // убирает клавиатуру
-        binding.editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+        getEditText().onEditorAction(EditorInfo.IME_ACTION_DONE)
     }
 
     override fun onDestroy() {
@@ -136,6 +121,50 @@ class Viewer : AppCompatActivity() {
     fun showToast(s: String) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
     }
+
+    fun animateFab() = with(binding) {
+        if (isOpenFab) {
+            fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.rotat_forward))
+            alignCenter.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            alignRight.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            alignLeft.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            noFormat.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_close))
+            bolt.isClickable = false
+            italic.isClickable = false
+            underline.isClickable = false
+            noFormat.isClickable = false
+            alignCenter.isClickable = false
+            alignRight.isClickable = false
+            alignLeft.isClickable = false
+            isOpenFab = false
+        } else {
+            fab.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.rotat_backforward))
+            alignCenter.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            alignLeft.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            alignRight.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            bolt.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            italic.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            underline.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            noFormat.startAnimation(AnimationUtils.loadAnimation(this@Viewer, R.anim.fab_open))
+            bolt.isClickable = true
+            italic.isClickable = true
+            underline.isClickable = true
+            noFormat.isClickable = true
+            alignCenter.isClickable = true
+            alignLeft.isClickable = true
+            alignRight.isClickable = true
+            isOpenFab = true
+        }
+
+    }
+
+    private fun close() {
+        binding.drawerLayout.close()
+    }
+
 
     fun getFonts() : Paint {
         val paint = Paint()

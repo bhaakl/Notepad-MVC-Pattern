@@ -1,6 +1,7 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.view.MenuItem
+import android.view.View
 
 interface OurTasks {
 
@@ -20,8 +21,8 @@ interface OurTasks {
     fun redo()
     fun undo()
     fun cut()
-    fun copy(textCopied: String)
-    fun paste(pasteItem: MenuItem): Boolean
+    fun copy()
+    fun paste(pasteItem: MenuItem)
     fun delete()
     fun find()
     fun replace()
@@ -40,6 +41,7 @@ interface OurTasks {
     fun makeItalic()
     fun makeCursive()
     fun makeUnderlined()
+    fun makeRegularFormat()
     fun makeCrossedOut()
     fun makeSubscript()
     fun makeSuperscript()
@@ -47,13 +49,14 @@ interface OurTasks {
     fun textBackground()
 
     // paragraph
-
     fun alignLeft()
     fun alignRight()
-    fun alignLeftAndLeft()
+    fun alignCenter()
     fun lineSpace()
     fun letterSpace()
 
     // Theme
     fun changeTheme()
+
+
 }

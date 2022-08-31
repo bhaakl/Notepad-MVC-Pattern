@@ -90,6 +90,18 @@
                     android:title="@string/paste" />
 
                 <item
+                    android:id="@+id/delete"
+                    android:checkable="true"
+                    android:icon="@drawable/ic_delete"
+                    android:title="@string/delete" />
+
+                <item
+                    android:id="@+id/select_all"
+                    android:checkable="true"
+                    android:icon="@drawable/ic_select_all"
+                    android:title="@string/select_all" />
+
+                <item
                     android:id="@+id/searchText"
                     android:checkable="true"
                     android:icon="@drawable/ic_search_in"
@@ -107,6 +119,11 @@
             android:id="@+id/subMenu3"
             android:title="@string/other">
             <menu>
+                <item
+                    android:id="@+id/exit"
+                    android:icon="@drawable/ic_exit_to_app"
+                    android:checkable="true"
+                    android:title="@string/exit"/>
 
                 <item
                     android:id="@+id/send"
