@@ -40,25 +40,18 @@ class TextEditor {
 
         fun paste(clipboardManager: ClipboardManager, pasteItem: MenuItem): String {
             var pasteData: String = ""
-
-            // Если в буфере обмена нет данных, отключаем пункт меню вставки.
-            // Если он содержит данные, решите, можете ли вы обрабатывать данные.
             pasteItem.isEnabled = when {
                 !clipboardManager.hasPrimaryClip() -> {
                     false
                 }
                 !(clipboardManager.primaryClipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN))!! -> {
-                    // Это отключает пункт меню вставки, так как в буфере обмена есть данные, но это не обычный текст
                     false
                 }
                 else -> {
-                    // Это включает пункт меню вставки, так как буфер обмена содержит обычный текст.
                     true
                 }
             }
             val item = clipboardManager.primaryClip?.getItemAt(0)
-
-            // Gets the clipboard as text.
             pasteData = item?.text.toString()
             return pasteData
         }

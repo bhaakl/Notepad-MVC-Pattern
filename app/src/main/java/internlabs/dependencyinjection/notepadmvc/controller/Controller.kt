@@ -14,8 +14,8 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
-import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
+import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
@@ -117,26 +117,21 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-    private fun getText(context: Context, uri: Uri?): ByteArray? {
-        val inputStream: InputStream?
+    private fun getText(context: Context, uri: Uri): CharArray? {
         return try {
-            inputStream =
-                context.contentResolver.openInputStream(uri!!)
-            val outputStream = ByteArrayOutputStream()
-            val bufferSize = 1024
-            val buffer = ByteArray(bufferSize)
-            var len = 0
-            while (inputStream!!.read(buffer)
-                    .also { len = it } != -1
-            ) {
-                outputStream.write(buffer, 0, len)
+            val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
+            val bfr = BufferedReader(InputStreamReader(inputStream))
+            val buffer = StringBuilder()
+            var buf: CharArray? = CharArray(10)
+            var numRead: Int
+            while (bfr.read(buf).also { numRead = it } != -1) {
+                val readData = String(buf!!, 0, numRead)
+                buffer.append(readData)
+                buf = CharArray(1024)
             }
-            inputStream.close()
-            with(outputStream) {
-                flush()
-                close()
-                toByteArray()
-            }
+            inputStream?.close()
+            bfr.close()
+            buffer.toString().toCharArray()
         } catch (ex: Exception) {
             Log.e("Error", ex.message.toString())
             viewer.showToast("getText error: ${ex.message}")
@@ -176,15 +171,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun paste(pasteItem: MenuItem) {
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        // Gets the clipboard as text.
         val pasteData = TextEditor.paste(clipboardManager, pasteItem)
         if (pasteData.isNotEmpty()) {
-            // Если строка содержит данные, то выполняется операция вставки
             viewer.setTextForEditor(pasteData)
             viewer.showToast("Pasted")
         } else {
-            // Что-то не так. Тип MIME был обычным текстом, но буфер обмена не
-            // содержат текст. Сообщить об ошибке.
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
         }
     }
@@ -367,9 +358,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-
-    //region  Медер Шермаматов
-    //-- служебный метод Фильтр для файлов()
     private fun isOk(uri: Uri): Boolean {
         val fileName = DocumentFile.fromSingleUri(viewer, uri)?.name
         if (fileName != null) {
@@ -389,7 +377,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
         return false
     }
-    // -- служебный метод Сохранение в файл()
+
     private fun saveToFile(uri: Uri) {
         val text = viewer.getEditText().text.toString()
         try {
@@ -406,7 +394,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             e.printStackTrace()
         }
     }
-    // -- служебный метод Сохранить как()
+
     private val saveAsDoc = viewer.registerForActivityResult(
         ActivityResultContracts
             .CreateDocument("application/ntp")
@@ -422,5 +410,4 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
 
     }
-    //endregion
 }

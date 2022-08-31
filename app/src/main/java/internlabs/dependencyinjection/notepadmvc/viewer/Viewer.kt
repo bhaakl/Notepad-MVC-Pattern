@@ -43,21 +43,13 @@ class Viewer : AppCompatActivity() {
         undoRedoManager.setMaxHistorySize(1000)
     }
 
-    /**
-     * @param setSelection  переносит курсор в конец строки у edit text
-     */
     fun setTextFromFile(string: String) {
         getEditText().setText(string)
         getEditText().setSelection(getEditText().text.length)
     }
 
-    /**
-     * setTextForEditor(): На  вход подается текст, который нужно поместить в ЕдитТекст. Задача этой функции
-     * поместить этот текст: определяется позиция для вставки текста, т.е где курсор, туда и вставляется
-     * обновляя при этом курсор в конец вставляемого текста
-     */
     fun setTextForEditor(strAdd: String) {
-        if (strAdd.isEmpty() || !binding.editText.isEnabled) { // нельзя выставить пока документ не создан
+        if (strAdd.isEmpty() || !binding.editText.isEnabled) {
             showToast("нельзя вставить текст пока документ не создан")
             return
         }
@@ -108,7 +100,6 @@ class Viewer : AppCompatActivity() {
     }
 
     fun keyBoardShow() {
-        // убирает клавиатуру
         getEditText().onEditorAction(EditorInfo.IME_ACTION_DONE)
     }
 
