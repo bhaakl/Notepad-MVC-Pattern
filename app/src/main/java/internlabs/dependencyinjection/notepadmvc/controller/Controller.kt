@@ -74,6 +74,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun new() {
         viewer.makeEditTextEditable()
         viewer.setTextFromFile("")
+        val fileReader: FileReader = FileReader()
         val outputFile: String =
             viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
         val file1 = File(outputFile)
