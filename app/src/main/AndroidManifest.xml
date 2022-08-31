@@ -35,9 +35,6 @@
             <intent-filter>
                 <action android:name="android.printservice.PrintService" />
             </intent-filter>
-            <meta-data
-                android:name="android.printservice"
-                android:resource = "@xml/custom" />
         </service>
     </application>
 

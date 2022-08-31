@@ -1,4 +1,5 @@
-<print-service android:label="CustomPrintService"
+<print-service xmlns:tools="http://schemas.android.com/tools"
+    android:label="CustomPrintService"
     android:vendor="Company Ltd."
-
-    xmlns:android="http://schemas.android.com/apk/res/android" />
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:ignore="MissingDefaultResource" />
