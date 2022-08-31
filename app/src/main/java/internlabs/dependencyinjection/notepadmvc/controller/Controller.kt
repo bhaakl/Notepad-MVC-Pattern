@@ -123,7 +123,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     { uri1 ->
         if (uri1 != null) {
             if (isOk(uri1)) {
-                println("......................")
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
                     println(it)
@@ -246,32 +245,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-    override fun replace() {
-        TODO("Not yet implemented")
-    }
-
     override fun selectAll() {
         viewer.getEditText().selectAll()
     }
 
-    override fun dateAndTime() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomIn() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomOut() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomDefault() {
-        TODO("Not yet implemented")
-    }
-
     override fun size() {
-
         val editText = viewer.getEditText()
         val spinner = viewer.findViewById<Spinner>(R.id.spinner)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -292,10 +270,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
-    }
-
-    override fun fontFamily() {
-        TODO("Not yet implemented")
     }
 
     override fun makeBold() {
@@ -331,30 +305,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         editText.setText(stringText)
     }
 
-    override fun makeCrossedOut() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeSubscript() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeSuperscript() {
-        TODO("Not yet implemented")
-    }
-
-    override fun textColor() {
-        TODO("Not yet implemented")
-    }
-
-    override fun textBackground() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeCursive() {
-        TODO("Not yet implemented")
-    }
-
     override fun alignLeft() {
         val editText = viewer.getEditText()
         editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
@@ -376,20 +326,12 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         editText.text = spannableString
     }
 
-    override fun lineSpace() {
-        TODO("Not yet implemented")
-    }
-
-    override fun letterSpace() {
-        TODO("Not yet implemented")
-    }
-
-    override fun changeTheme() {
-        TODO("Not yet implemented")
-    }
-
     override fun save() {
-        saveToFile(uri)
+        if (uri == Uri.parse("")){
+            saveAs()
+        } else {
+            saveToFile(uri)
+        }
         viewer.showToast("File has been saved!")
     }
 
@@ -409,20 +351,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-    override fun recent() {
-        TODO("Not yet implemented")
-    }
-
     override fun aboutApp() {
         dialog = Dialog(viewer)
         dialog.setContentView(R.layout.dialog_layout)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
-    }
-
-    
-    override fun sentToEmail() {
-        TODO("Not yet implemented")
     }
 
     override fun exit() {
@@ -432,8 +365,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setCancelable(true)
             .setPositiveButton(" Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
             .setNegativeButton(" Yes") { _, _ ->
-                 exitProcess(0)
-           // viewer.finish()
+                exitProcess(0)
+                // viewer.finish()
             }
         alertDialog.show()
     }
@@ -542,4 +475,79 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     }
     //endregion
+
+
+
+
+
+
+
+    override fun replace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun dateAndTime() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomIn() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomOut() {
+        TODO("Not yet implemented")
+    }
+
+    override fun zoomDefault() {
+        TODO("Not yet implemented")
+    }
+
+    override fun fontFamily() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeCrossedOut() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeSubscript() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeSuperscript() {
+        TODO("Not yet implemented")
+    }
+
+    override fun textColor() {
+        TODO("Not yet implemented")
+    }
+
+    override fun textBackground() {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeCursive() {
+        TODO("Not yet implemented")
+    }
+
+    override fun lineSpace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun letterSpace() {
+        TODO("Not yet implemented")
+    }
+
+    override fun changeTheme() {
+        TODO("Not yet implemented")
+    }
+
+    override fun recent() {
+        TODO("Not yet implemented")
+    }
+
+    override fun sentToEmail() {
+        TODO("Not yet implemented")
+    }
+
 }
