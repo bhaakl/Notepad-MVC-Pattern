@@ -183,10 +183,10 @@ class Viewer : AppCompatActivity() {
             View.TEXT_ALIGNMENT_CENTER -> return Paint.Align.CENTER
             View.TEXT_ALIGNMENT_TEXT_END -> return Paint.Align.RIGHT
             View.TEXT_ALIGNMENT_GRAVITY -> {
-                println("There is no corresponding in Paint.Align")
+                return Paint.Align.LEFT
             }
             View.TEXT_ALIGNMENT_INHERIT -> {
-                println("There is no corresponding in Paint.Align")
+                return Paint.Align.LEFT
             }
             View.TEXT_ALIGNMENT_VIEW_END -> return Paint.Align.RIGHT
             View.TEXT_ALIGNMENT_VIEW_START -> return Paint.Align.LEFT
