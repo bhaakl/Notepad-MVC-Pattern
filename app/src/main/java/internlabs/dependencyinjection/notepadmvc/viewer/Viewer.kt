@@ -2,10 +2,6 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.graphics.Paint
 import android.graphics.Typeface
-import android.graphics.Color
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.ColorDrawable
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
@@ -47,7 +43,7 @@ class Viewer : AppCompatActivity() {
             drawerLayout.open()
             editText.onEditorAction(EditorInfo.IME_ACTION_DONE)
         }
-        editText.breakStrategy = editText.width-30
+        editText.breakStrategy = editText.width - 30
 
         navigationView.setNavigationItemSelectedListener(controller)
         fab.setOnClickListener(controller)
@@ -73,7 +69,7 @@ class Viewer : AppCompatActivity() {
 
     fun setTextForEditor(strAdd: String) {
         if (strAdd.isEmpty() || !binding.editText.isEnabled) {
-            showToast("нельзя вставить текст пока документ не создан")
+            showToast("Create document before paste")
             return
         }
         val old = getEditText().text.toString()
@@ -151,12 +147,12 @@ class Viewer : AppCompatActivity() {
 
     }
 
-    private fun close() {
+    fun close() {
         binding.drawerLayout.close()
     }
 
 
-    fun getFonts() : Paint {
+    fun getFonts(): Paint {
         val paint = Paint()
         val spSize = binding.editText.textSize
         paint.textAlign = getTextAlignment()
@@ -169,7 +165,7 @@ class Viewer : AppCompatActivity() {
     }
 
     private fun getTextAlignment(): Paint.Align {
-        when(binding.editText.textAlignment){
+        when (binding.editText.textAlignment) {
             View.TEXT_ALIGNMENT_TEXT_START -> return Paint.Align.LEFT
             View.TEXT_ALIGNMENT_CENTER -> return Paint.Align.CENTER
             View.TEXT_ALIGNMENT_TEXT_END -> return Paint.Align.RIGHT
@@ -186,7 +182,7 @@ class Viewer : AppCompatActivity() {
     }
 
     private fun getTypeface(): Int {
-        if (binding.editText.typeface.isBold && binding.editText.typeface.isItalic){
+        if (binding.editText.typeface.isBold && binding.editText.typeface.isItalic) {
             return Typeface.BOLD_ITALIC
         } else if (binding.editText.typeface.isItalic) {
             return Typeface.ITALIC

@@ -31,10 +31,10 @@
         tools:ignore="AlwaysShowAction" />
 
     <item
-        android:id="@+id/searchBtm"
-        android:contentDescription="@string/content_description_search"
-        android:icon="@drawable/ic_search_in_btm"
-        android:title="@string/search_in"
+        android:id="@+id/openBtm"
+        android:contentDescription="@string/open"
+        android:icon="@drawable/ic_open_file_btm"
+        android:title="@string/open"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
 
@@ -44,5 +44,10 @@
         android:title="@string/_new"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
+
+    <item
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction"
+        android:title="" />
 
 </menu>

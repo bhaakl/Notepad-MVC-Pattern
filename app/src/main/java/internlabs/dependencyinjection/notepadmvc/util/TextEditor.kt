@@ -54,7 +54,6 @@ class TextEditor {
                     true
                 }
             }
-
             return pasteData
         }
 

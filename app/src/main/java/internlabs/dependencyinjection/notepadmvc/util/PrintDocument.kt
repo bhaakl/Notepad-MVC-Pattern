@@ -55,7 +55,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             newAttributes: PrintAttributes,
             cancellationSignal: CancellationSignal,
             callback:
-            PrintDocumentAdapter.LayoutResultCallback,
+            LayoutResultCallback,
             metadata: Bundle,
         ) {
             myPdfDocument = PrintedPdfDocument(context, newAttributes)
@@ -89,13 +89,13 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
 
         private fun makeCorrectLines() {
             for (index in stringLines.indices) {
-                if (fonts.measureText(stringLines[index]).toInt() > (pageWidth-35)) {
+                if (fonts.measureText(stringLines[index]).toInt() > (pageWidth - 35)) {
                     rawString = stringLines[index]
-                    while (fonts.measureText(rawString).toInt() > (pageWidth-35)) {
+                    while (fonts.measureText(rawString).toInt() > (pageWidth - 35)) {
                         newLine(rawString)
                     }
                     finalStringLines.add(rawString)
-                    rawString=""
+                    rawString = ""
                 } else {
                     finalStringLines.add(stringLines[index])
                 }
@@ -146,7 +146,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             val bounds = Rect()
 
             fonts.getTextBounds(text, 0, text.length, bounds)
-            textHeight = bounds.height()-4
+            textHeight = bounds.height() - 4
             val printArea = pageHeight - titleBaseline * 2
             itemsPerPage = printArea / (textHeight + 16) // default item count for portrait mode
 
@@ -163,7 +163,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
                     tmp = ""
                 }
             }
-            if (tmp.isNotEmpty()){
+            if (tmp.isNotEmpty()) {
                 finalStringLines.add(tmp)
             }
         }
@@ -174,7 +174,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             } else {
                 s
             }
-            if (fonts.measureText(beforeLast).toInt() > (pageWidth-35)) {
+            if (fonts.measureText(beforeLast).toInt() > (pageWidth - 35)) {
                 if (beforeLast.contains(' ')) {
                     newLine(beforeLast)
                 } else {
@@ -183,7 +183,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
                 }
             } else {
                 finalStringLines.add(beforeLast)
-                rawString = rawString.substring(beforeLast.length+1)
+                rawString = rawString.substring(beforeLast.length + 1)
             }
         }
 
@@ -204,16 +204,22 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
                 if (maxItem == itemsPerPage) {
                     break
                 }
-                if (i == 0){
-                    canvas.drawText("", leftMargin.toFloat(),
-                        ((textHeight) * titleBaseline).toFloat(), fonts)
+                if (i == 0) {
+                    canvas.drawText(
+                        "", leftMargin.toFloat(),
+                        ((textHeight) * titleBaseline).toFloat(), fonts
+                    )
                     titleBaseline++
                     titleBaseline++
-                    canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
-                        ((textHeight) * titleBaseline).toFloat(), fonts)
+                    canvas.drawText(
+                        finalStringLines[i], leftMargin.toFloat(),
+                        ((textHeight) * titleBaseline).toFloat(), fonts
+                    )
                 } else {
-                    canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
-                        ((textHeight) * titleBaseline).toFloat(), fonts)
+                    canvas.drawText(
+                        finalStringLines[i], leftMargin.toFloat(),
+                        ((textHeight) * titleBaseline).toFloat(), fonts
+                    )
                 }
                 index++
                 maxItem++
@@ -221,10 +227,12 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
                 titleBaseline++
             }
 
-            canvas.drawText((pageNumber + 1).toString(),
+            canvas.drawText(
+                (pageNumber + 1).toString(),
                 (page.info.pageWidth / 2).toFloat(),
                 pageHeight.toFloat(),
-                fonts)
+                fonts
+            )
         }
     }
 }

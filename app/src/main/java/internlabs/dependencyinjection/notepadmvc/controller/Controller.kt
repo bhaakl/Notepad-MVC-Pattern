@@ -23,7 +23,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
@@ -35,23 +34,21 @@ import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.system.exitProcess
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener {
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
-    private var pasteItemInNavMenu: MenuItem? = null  //used for method paste()
-    private var pasteItemInBotMenu: MenuItem? = null  //used for method paste()
+    private var pasteItemInNavMenu: MenuItem? = null
+    private var pasteItemInBotMenu: MenuItem? = null
 
-    private lateinit var manager : TextUndoRedo
+    private lateinit var manager: TextUndoRedo
 
     init {
         this.viewer = viewer
     }
 
-    // DrawerLayout click handler
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -74,11 +71,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             R.id.about_app -> {
                 aboutApp()
             }
-
             R.id.exit -> {
                 exit()
             }
-
             R.id.copy -> {
                 copy()
             }
@@ -116,16 +111,16 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         return true
     }
 
-    // bottomAppBar click handler
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         return when (item?.itemId) {
             R.id.newFileBtm -> {
                 new()
-                viewer.getUndoRedoManager().clearHistory()
+                clearUndoRedoHistory()
                 true
             }
-            R.id.searchBtm -> {
-                find()
+            R.id.openBtm -> {
+                open()
+                clearUndoRedoHistory()
                 true
             }
             R.id.redoBtm -> {
@@ -202,14 +197,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun redo() {
         manager = viewer.getUndoRedoManager()
-        if(manager.canRedo) {
+        if (manager.canRedo) {
             manager.redo()
         }
     }
 
     override fun undo() {
         manager = viewer.getUndoRedoManager()
-        if(manager.canUndo) {
+        if (manager.canUndo) {
             manager.undo()
         }
     }
@@ -334,20 +329,24 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun makeBold() {
         val editText = viewer.getEditText()
         val spannableString = SpannableStringBuilder(editText.text)
-        spannableString.setSpan(StyleSpan(Typeface.BOLD),
+        spannableString.setSpan(
+            StyleSpan(Typeface.BOLD),
             editText.selectionStart,
             editText.selectionEnd,
-            0)
+            0
+        )
         editText.text = spannableString
     }
 
     override fun makeItalic() {
         val editText = viewer.getEditText()
         val spannableString = SpannableStringBuilder(editText.text)
-        spannableString.setSpan(StyleSpan(Typeface.ITALIC),
+        spannableString.setSpan(
+            StyleSpan(Typeface.ITALIC),
             editText.selectionStart,
             editText.selectionEnd,
-            0)
+            0
+        )
         editText.text = spannableString
     }
 
@@ -360,7 +359,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun makeRegularFormat() {
         val editText = viewer.getEditText()
-        val stringText :String = editText.text.toString()
+        val stringText: String = editText.text.toString()
         editText.setText(stringText)
     }
 
@@ -386,7 +385,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun save() {
-        if (uri == Uri.parse("")){
+        if (uri == Uri.parse("")) {
             saveAs()
         } else {
             saveToFile(uri)
@@ -394,7 +393,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun saveAs() {
-        if (uri == Uri.parse("")){
+        if (uri == Uri.parse("")) {
             saveAsDoc.launch("Example.ntp")
         } else {
             val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
@@ -403,12 +402,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun print() {
-        val content : String = viewer.getEditText().text.toString()
-        if(content != "" && contentIsNormal(content)){
-            val printDocument = PrintDocument(content,this.viewer, viewer.getFonts())
+        val content: String = viewer.getEditText().text.toString()
+        if (content != "" && contentIsNormal(content)) {
+            val printDocument = PrintDocument(content, this.viewer, viewer.getFonts())
             printDocument.doPrint()
-        }
-        else {
+        } else {
             viewer.showToast("Document is empty")
         }
     }
@@ -436,7 +434,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setNegativeButton(" Yes") { _, _ ->
                 clearUndoRedoHistory()
                 manager.disconnect()
-                //exitProcess(0)
+                viewer.close()
                 viewer.finish()
             }
         alertDialog.show()
@@ -493,7 +491,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         val fullFileName = DocumentFile.fromSingleUri(viewer, uri)?.name
         var dotCount = 0
         fullFileName?.forEach {
-            if (it == '.'){
+            if (it == '.') {
                 dotCount++
             }
         }
@@ -506,9 +504,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                     if (extensionOfFile == "ntp"
                         || extensionOfFile == "kt"
                         || extensionOfFile == "swift"
-                        || extensionOfFile == "java") {
+                        || extensionOfFile == "java"
+                    ) {
                         val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
-                        println("size          $size" )
+                        println("size          $size")
                         val max = 5823577
                         if (size != null) {
                             return size < max
@@ -523,7 +522,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     private fun isCorrectName(fileName: String): Boolean {
         fileName.forEach {
             val int: Int = it.code
-            if (int in 65..90 || int in 97..122){
+            if (int in 65..90 || int in 97..122) {
                 println("")
             } else {
                 return false
@@ -561,10 +560,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 viewer.setTextFromFile("")
             } else {
                 DocumentFile.fromSingleUri(viewer, it)?.delete()
-                viewer.showToast("File extension is not supported! ")
+                viewer.showToast("File extension is not supported!")
             }
         }
     }
 
-    }
 }
