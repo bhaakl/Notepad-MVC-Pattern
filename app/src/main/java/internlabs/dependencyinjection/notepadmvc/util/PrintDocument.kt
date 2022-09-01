@@ -147,8 +147,9 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
 
             fonts.getTextBounds(text, 0, text.length, bounds)
             textHeight = bounds.height()-4
+            println(textHeight)
             val printArea = pageHeight - titleBaseline * 2
-            itemsPerPage = printArea / (textHeight + 25) // default item count for portrait mode
+            itemsPerPage = printArea / (textHeight * 2 + 3) // default item count for portrait mode
 
             val printItemCount: Int = finalStringLines.size
             return ceil((printItemCount / itemsPerPage.toDouble())).toInt()
