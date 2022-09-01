@@ -55,7 +55,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             newAttributes: PrintAttributes,
             cancellationSignal: CancellationSignal,
             callback:
-            LayoutResultCallback,
+            PrintDocumentAdapter.LayoutResultCallback,
             metadata: Bundle,
         ) {
             myPdfDocument = PrintedPdfDocument(context, newAttributes)
@@ -148,7 +148,7 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             fonts.getTextBounds(text, 0, text.length, bounds)
             textHeight = bounds.height() - 4
             val printArea = pageHeight - titleBaseline * 2
-            itemsPerPage = printArea / (textHeight + 25) // default item count for portrait mode
+            itemsPerPage = printArea / (textHeight * 2 + 3)
 
             val printItemCount: Int = finalStringLines.size
             return ceil((printItemCount / itemsPerPage.toDouble())).toInt()
