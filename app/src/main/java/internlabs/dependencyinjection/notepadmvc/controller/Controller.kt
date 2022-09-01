@@ -16,6 +16,7 @@ import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.util.TextEditor
+import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
 
@@ -25,6 +26,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
 
+    private lateinit var manager : TextUndoRedo
+
     init {
         this.viewer = viewer
     }
@@ -33,19 +36,15 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         when (item.itemId) {
             R.id.openFile -> {
                 open()
-                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.newFile -> {
                 new()
-                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.save -> {
                 save()
-                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.saveAs -> {
                 saveAs()
-                viewer.getUndoRedoManager().clearHistory()
             }
             R.id.about_app -> {
                 viewer.showAlertDialog()
@@ -112,7 +111,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 uri = uri1
                 viewer.makeEditTextEditable()
             } else {
-                viewer.showToast("File extension is not supported")
+                viewer.showToast("File is not supported")
             }
         }
     }
@@ -140,14 +139,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun redo() {
-        val manager = viewer.getUndoRedoManager()
+        manager = viewer.getUndoRedoManager()
         if(manager.canRedo) {
             manager.redo()
         }
     }
 
     override fun undo() {
-        val manager = viewer.getUndoRedoManager()
+        manager = viewer.getUndoRedoManager()
         if(manager.canUndo) {
             manager.undo()
         }

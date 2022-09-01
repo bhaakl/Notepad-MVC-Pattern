@@ -10,7 +10,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
 import internlabs.dependencyinjection.notepadmvc.databinding.ActivityViewerBinding
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
-import java.util.*
 
 
 class Viewer : AppCompatActivity() {
@@ -40,7 +39,7 @@ class Viewer : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener(controller)
 
         undoRedoManager = TextUndoRedo(binding.editText)
-        undoRedoManager.setMaxHistorySize(1000)
+        undoRedoManager.setMaxHistorySize(100)
     }
 
     fun setTextFromFile(string: String) {
@@ -101,14 +100,6 @@ class Viewer : AppCompatActivity() {
 
     fun keyBoardShow() {
         getEditText().onEditorAction(EditorInfo.IME_ACTION_DONE)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        undoRedoManager.clearHistory()
-        undoRedoManager.disconnect()
-        close()
     }
 
     fun makeEditTextEditable() {
