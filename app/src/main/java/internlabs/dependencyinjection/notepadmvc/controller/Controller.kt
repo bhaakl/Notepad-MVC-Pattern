@@ -17,7 +17,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.documentfile.provider.DocumentFile
@@ -48,15 +47,19 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         when (item.itemId) {
             R.id.openFile -> {
                 open()
+                clearUndoRedoHistory()
             }
             R.id.newFile -> {
                 new()
+                clearUndoRedoHistory()
             }
             R.id.save -> {
                 save()
+                clearUndoRedoHistory()
             }
             R.id.saveAs -> {
                 saveAs()
+                clearUndoRedoHistory()
             }
             R.id.about_app -> {
                 aboutApp()
@@ -114,7 +117,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             if (isOk(uri1)) {
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
-                    //println(it)
                     viewer.setTextFromFile(it)
                 }
                 uri = uri1
@@ -145,6 +147,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             viewer.showToast("getText error: ${ex.message}")
             null
         }
+    }
+
+    private fun clearUndoRedoHistory() {
+        viewer.getUndoRedoManager().clearHistory()
     }
 
     override fun redo() {
@@ -361,8 +367,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setCancelable(true)
             .setPositiveButton(" Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
             .setNegativeButton(" Yes") { _, _ ->
+                clearUndoRedoHistory()
+                manager.disconnect()
                 exitProcess(0)
-                // viewer.finish()
             }
         alertDialog.show()
     }
@@ -414,8 +421,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-    //region  Медер Шермаматов
-    //-- служебный метод Фильтр для файлов()
     private fun isOk(uri: Uri): Boolean {
         val fullFileName = DocumentFile.fromSingleUri(viewer, uri)?.name
         var dotCount = 0
@@ -449,7 +454,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     private fun isCorrectName(fileName: String): Boolean {
         fileName.forEach {
-            val int: Int = it.code.toInt()
+            val int: Int = it.code
             if (int in 65..90 || int in 97..122){
                 println("")
             } else {

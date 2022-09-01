@@ -9,7 +9,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isInvisible
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
@@ -53,7 +52,7 @@ class Viewer : AppCompatActivity() {
         alignRight.setOnClickListener(controller)
         controller.size()
 
-        undoRedoManager = TextUndoRedo(binding.editText)
+        undoRedoManager = TextUndoRedo(editText)
         undoRedoManager.setMaxHistorySize(100)
     }
 
