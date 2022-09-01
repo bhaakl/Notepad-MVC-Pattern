@@ -1,7 +1,9 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.app.Dialog
-import android.content.*
+import android.content.ClipboardManager
+import android.content.ContentValues
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
@@ -18,7 +20,10 @@ import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
@@ -28,14 +33,17 @@ import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.system.exitProcess
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
-    NavigationView.OnNavigationItemSelectedListener {
+    NavigationView.OnNavigationItemSelectedListener, Toolbar.OnMenuItemClickListener {
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
-    private lateinit var dialog: Dialog
+    private var pasteItemInNavMenu: MenuItem? = null  //used for method paste()
+    private var pasteItemInBotMenu: MenuItem? = null  //used for method paste()
 
     private lateinit var manager : TextUndoRedo
 
@@ -43,6 +51,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         this.viewer = viewer
     }
 
+    // DrawerLayout click handler
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.openFile -> {
@@ -74,6 +84,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             }
             R.id.paste -> {
                 paste(item)
+                pasteItemInNavMenu = item
             }
             R.id.cut -> {
                 cut()
@@ -96,10 +107,46 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             R.id.searchText -> {
                 find()
             }
+            R.id.dateAndTime -> {
+                dateAndTime()
+            }
         }
         item.isChecked = true
         viewer.getDrawerLayout().close()
         return true
+    }
+
+    // bottomAppBar click handler
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.newFileBtm -> {
+                new()
+                viewer.getUndoRedoManager().clearHistory()
+                true
+            }
+            R.id.searchBtm -> {
+                find()
+                true
+            }
+            R.id.redoBtm -> {
+                redo()
+                true
+            }
+            R.id.undoBtm -> {
+                undo()
+                true
+            }
+            R.id.pasteBtm -> {
+                paste(item)
+                pasteItemInBotMenu = item
+                true
+            }
+            R.id.copyBtm -> {
+                copy()
+                true
+            }
+            else -> false
+        }
     }
 
     override fun new() {
@@ -170,16 +217,26 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun cut() {
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        if (TextEditor.cut(viewer.getEditText(), clipboardManager))
+        if (TextEditor.cut(viewer.getEditText(), clipboardManager)) {
             viewer.showToast("Cut Out")
+            if (pasteItemInNavMenu?.isEnabled == false)
+                pasteItemInNavMenu?.isEnabled = true
+            if (pasteItemInBotMenu?.isEnabled == false)
+                pasteItemInBotMenu?.isEnabled = true
+        }
     }
 
     override fun copy() {
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        if (TextEditor.copy(viewer.getEditText(), clipboardManager))
+        if (TextEditor.copy(viewer.getEditText(), clipboardManager)) {
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
                 viewer.showToast("Copied")
+            if (pasteItemInNavMenu?.isEnabled == false || pasteItemInBotMenu?.isEnabled == false) {
+                pasteItemInNavMenu?.isEnabled = true
+                pasteItemInBotMenu?.isEnabled = true
+            }
+        }
     }
 
     override fun paste(pasteItem: MenuItem) {
@@ -188,15 +245,17 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val pasteData = TextEditor.paste(clipboardManager, pasteItem)
         if (pasteData.isNotEmpty()) {
+            if (!pasteItem.isEnabled) pasteItem.isEnabled = true
             viewer.setTextForEditor(pasteData)
             viewer.showToast("Pasted")
         } else {
+            viewer.showToast("Clipboard is empty!")
             Log.e(ContentValues.TAG, "Clipboard contains an invalid data type")
         }
     }
 
     override fun delete() {
-        if(TextEditor.delete(viewer.getEditText()))
+        if (TextEditor.delete(viewer.getEditText()))
             viewer.showToast("Deleted")
     }
 
@@ -213,6 +272,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .show()
 
         val mPositiveButton = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
+        val mNegativeButton = mBuilder.getButton(AlertDialog.BUTTON_NEGATIVE)
+        mNegativeButton.setTextColor(Color.RED)
         val editTextFind = view.findViewById<EditText>(R.id.findWhat)
 
         var posD = 0
@@ -223,7 +284,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                     editTextFind.text.toString().toCharArray()
                 )
                 if (matchingAnswer.isNotEmpty()) {
-                    if (posD == matchingAnswer.size || posD > matchingAnswer.size ) posD = 0
+                    if (posD == matchingAnswer.size || posD > matchingAnswer.size) posD = 0
                     val edFind = editTextFind.text.toString()
                     viewer.getEditText().setSelection(
                         matchingAnswer[posD++],
@@ -238,6 +299,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
     override fun selectAll() {
         viewer.getEditText().selectAll()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun dateAndTime() {
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
+        val formatted = current.format(formatter)
+        viewer.setTextForEditor(formatted)
     }
 
     override fun size() {
@@ -352,7 +421,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun aboutApp() {
-        dialog = Dialog(viewer)
+        val dialog = Dialog(viewer)
         dialog.setContentView(R.layout.dialog_layout)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
@@ -497,71 +566,5 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-    override fun replace() {
-        TODO("Not yet implemented")
-    }
-
-    override fun dateAndTime() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomIn() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomOut() {
-        TODO("Not yet implemented")
-    }
-
-    override fun zoomDefault() {
-        TODO("Not yet implemented")
-    }
-
-    override fun fontFamily() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeCrossedOut() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeSubscript() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeSuperscript() {
-        TODO("Not yet implemented")
-    }
-
-    override fun textColor() {
-        TODO("Not yet implemented")
-    }
-
-    override fun textBackground() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeCursive() {
-        TODO("Not yet implemented")
-    }
-
-    override fun lineSpace() {
-        TODO("Not yet implemented")
-    }
-
-    override fun letterSpace() {
-        TODO("Not yet implemented")
-    }
-
-    override fun changeTheme() {
-        TODO("Not yet implemented")
-    }
-
-    override fun recent() {
-        TODO("Not yet implemented")
-    }
-
-    override fun sentToEmail() {
-        TODO("Not yet implemented")
     }
 }

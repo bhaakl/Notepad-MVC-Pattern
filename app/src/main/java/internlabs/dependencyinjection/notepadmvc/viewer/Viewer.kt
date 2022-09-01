@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -13,6 +14,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.controller.Controller
@@ -35,6 +37,8 @@ class Viewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.bottomAppBar.isVisible =
+            resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
         initListeners()
     }
 
@@ -55,6 +59,8 @@ class Viewer : AppCompatActivity() {
         alignCenter.setOnClickListener(controller)
         alignRight.setOnClickListener(controller)
         controller.size()
+
+        bottomAppBar.setOnMenuItemClickListener(controller)
 
         undoRedoManager = TextUndoRedo(editText)
         undoRedoManager.setMaxHistorySize(100)

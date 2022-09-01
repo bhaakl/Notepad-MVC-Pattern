@@ -48,11 +48,13 @@ class TextEditor {
                     false
                 }
                 else -> {
+                    val item = clipboardManager.primaryClip?.getItemAt(0)
+
+                    pasteData = item?.text.toString()
                     true
                 }
             }
-            val item = clipboardManager.primaryClip?.getItemAt(0)
-            pasteData = item?.text.toString()
+
             return pasteData
         }
 
