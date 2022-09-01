@@ -271,7 +271,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun size() {
-
         val editText = viewer.getEditText()
         val spinner = viewer.findViewById<Spinner>(R.id.spinner)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -282,7 +281,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 id: Long,
             ) {
                 when (spinner.selectedItemPosition) {
-                    1 -> editText.textSize = 20f
+                    1 -> editText.textSize = 18f
                     2 -> editText.textSize = 25f
                     3 -> editText.textSize = 30f
                     4 -> editText.textSize = 35f
@@ -291,7 +290,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
-
     }
 
     override fun fontFamily() {
@@ -432,8 +430,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setCancelable(true)
             .setPositiveButton(" Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
             .setNegativeButton(" Yes") { _, _ ->
-                 exitProcess(0)
-           // viewer.finish()
+                 //exitProcess(0)
+            viewer.finish()
             }
         alertDialog.show()
     }
