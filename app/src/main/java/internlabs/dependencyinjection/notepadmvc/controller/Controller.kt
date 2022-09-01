@@ -1,15 +1,25 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
+import android.app.Dialog
 import android.content.*
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.EditText
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.FileProvider
+import androidx.appcompat.app.AlertDialog
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
 import internlabs.dependencyinjection.notepadmvc.R
@@ -19,12 +29,14 @@ import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.util.TextUndoRedo
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
+import kotlin.system.exitProcess
 
 
 class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     NavigationView.OnNavigationItemSelectedListener {
     private var viewer: Viewer
     private var uri: Uri = Uri.parse("")
+    private lateinit var dialog: Dialog
 
     private lateinit var manager : TextUndoRedo
 
@@ -47,8 +59,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 saveAs()
             }
             R.id.about_app -> {
-                viewer.showAlertDialog()
+                aboutApp()
             }
+
+            R.id.exit -> {
+                exit()
+            }
+
             R.id.copy -> {
                 copy()
             }
@@ -85,14 +102,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun new() {
         viewer.makeEditTextEditable()
         viewer.setTextFromFile("")
-        val outputFile: String =
-            viewer.getExternalFilesDir("Store").toString() + "/Example.ntp"
-        val file1 = File(outputFile)
-        uri = FileProvider.getUriForFile(
-            viewer,
-            "internlabs.dependencyinjection.notepadmvc.provider",
-            file1
-        )
     }
 
     override fun open() {
@@ -105,7 +114,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             if (isOk(uri1)) {
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
-                    println(it)
+                    //println(it)
                     viewer.setTextFromFile(it)
                 }
                 uri = uri1
@@ -164,10 +173,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         if (TextEditor.copy(viewer.getEditText(), clipboardManager))
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-            viewer.showToast("Copied")
+                viewer.showToast("Copied")
     }
 
     override fun paste(pasteItem: MenuItem) {
+        viewer.makeEditTextEditable()
         val clipboardManager =
             viewer.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val pasteData = TextEditor.paste(clipboardManager, pasteItem)
@@ -187,7 +197,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun find() {
         val inflater: LayoutInflater = LayoutInflater.from(viewer)
         val view: View = inflater.inflate(R.layout.feature_find, null)
-        val mBuilder = androidx.appcompat.app.AlertDialog.Builder(viewer)
+        val mBuilder = AlertDialog.Builder(viewer)
             .setTitle("Find")
             .setIcon(R.drawable.ic_search_in)
             .setView(view)
@@ -196,7 +206,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setCancelable(true)
             .show()
 
-        val mPositiveButton = mBuilder.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+        val mPositiveButton = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
         val editTextFind = view.findViewById<EditText>(R.id.findWhat)
 
         var posD = 0
@@ -220,12 +230,271 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         }
     }
 
-    override fun replace() {
-        TODO("Not yet implemented")
-    }
-
     override fun selectAll() {
         viewer.getEditText().selectAll()
+    }
+
+    override fun size() {
+        val editText = viewer.getEditText()
+        val spinner = viewer.findViewById<Spinner>(R.id.spinner)
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                when (spinner.selectedItemPosition) {
+                    1 -> editText.textSize = 20f
+                    2 -> editText.textSize = 25f
+                    3 -> editText.textSize = 30f
+                    4 -> editText.textSize = 35f
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+
+    }
+
+    override fun makeBold() {
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(StyleSpan(Typeface.BOLD),
+            editText.selectionStart,
+            editText.selectionEnd,
+            0)
+        editText.text = spannableString
+    }
+
+    override fun makeItalic() {
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(StyleSpan(Typeface.ITALIC),
+            editText.selectionStart,
+            editText.selectionEnd,
+            0)
+        editText.text = spannableString
+    }
+
+    override fun makeUnderlined() {
+        val editText = viewer.getEditText()
+        val spannableString = SpannableStringBuilder(editText.text)
+        spannableString.setSpan(UnderlineSpan(), editText.selectionStart, editText.selectionEnd, 0)
+        editText.text = spannableString
+    }
+
+    override fun makeRegularFormat() {
+        val editText = viewer.getEditText()
+        val stringText :String = editText.text.toString()
+        editText.setText(stringText)
+    }
+
+    override fun alignLeft() {
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
+    }
+
+    override fun alignRight() {
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_TEXT_END
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
+    }
+
+    override fun alignCenter() {
+        val editText = viewer.getEditText()
+        editText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+        val spannableString = SpannableStringBuilder(editText.text)
+        editText.text = spannableString
+    }
+
+    override fun save() {
+        if (uri == Uri.parse("")){
+            saveAs()
+        } else {
+            saveToFile(uri)
+        }
+    }
+
+    override fun saveAs() {
+        if (uri == Uri.parse("")){
+            saveAsDoc.launch("Example.ntp")
+        } else {
+            val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
+            saveAsDoc.launch(u)
+        }
+
+    }
+
+    override fun print() {
+        val content : String = viewer.getEditText().text.toString()
+        if(content != "" && contentIsNormal(content)){
+            val printDocument = PrintDocument(content,this.viewer, viewer.getFonts())
+            printDocument.doPrint()
+        }
+        else {
+            viewer.showToast("Document is empty")
+        }
+    }
+
+    private fun contentIsNormal(content: String): Boolean {
+        content.forEach {
+            if (it != ' ' && it != '\n') return true
+        }
+        return false
+    }
+
+    override fun aboutApp() {
+        dialog = Dialog(viewer)
+        dialog.setContentView(R.layout.dialog_layout)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
+    }
+
+    override fun exit() {
+        val alertDialog = AlertDialog.Builder(viewer)
+        alertDialog.setTitle("Exit")
+            .setMessage(" Do you want to exit? ")
+            .setCancelable(true)
+            .setPositiveButton(" Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
+            .setNegativeButton(" Yes") { _, _ ->
+                exitProcess(0)
+                // viewer.finish()
+            }
+        alertDialog.show()
+    }
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.editText -> {
+                viewer.keyBoardShow()
+            }
+
+            R.id.fab -> {
+                viewer.animateFab()
+            }
+
+            R.id.bolt -> {
+                viewer.animateFab()
+                makeBold()
+            }
+
+            R.id.italic -> {
+                viewer.animateFab()
+                makeItalic()
+            }
+
+            R.id.underline -> {
+                viewer.animateFab()
+                makeUnderlined()
+            }
+
+            R.id.no_format -> {
+                viewer.animateFab()
+                makeRegularFormat()
+            }
+
+            R.id.align_left -> {
+                viewer.animateFab()
+                alignLeft()
+            }
+
+            R.id.align_right -> {
+                viewer.animateFab()
+                alignRight()
+            }
+
+            R.id.align_center -> {
+                viewer.animateFab()
+                alignCenter()
+            }
+        }
+    }
+
+    //region  Медер Шермаматов
+    //-- служебный метод Фильтр для файлов()
+    private fun isOk(uri: Uri): Boolean {
+        val fullFileName = DocumentFile.fromSingleUri(viewer, uri)?.name
+        var dotCount = 0
+        fullFileName?.forEach {
+            if (it == '.'){
+                dotCount++
+            }
+        }
+        if (fullFileName != null && dotCount == 1) {
+            if (fullFileName.lastIndexOf(".") != -1 && fullFileName.lastIndexOf(".") != 0) {
+                var extensionOfFile = fullFileName.substring(fullFileName.lastIndexOf(".") + 1)
+                extensionOfFile = extensionOfFile.substringBefore(" ")
+                val fileName = fullFileName.substringBefore(".")
+                if (isCorrectName(fileName)) {
+                    if (extensionOfFile == "ntp"
+                        || extensionOfFile == "kt"
+                        || extensionOfFile == "swift"
+                        || extensionOfFile == "java") {
+                        val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
+                        println("size          $size" )
+                        val max = 5823577
+                        if (size != null) {
+                            return size < max
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    private fun isCorrectName(fileName: String): Boolean {
+        fileName.forEach {
+            val int: Int = it.code.toInt()
+            if (int in 65..90 || int in 97..122){
+                println("")
+            } else {
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun saveToFile(uri: Uri) {
+        val text = viewer.getEditText().text.toString()
+        try {
+            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use { content ->
+                FileOutputStream(content.fileDescriptor).use { fos ->
+                    fos.write(text.toByteArray())
+                    fos.flush()
+                    fos.close()
+                }
+            }
+            viewer.showToast("File has been saved!")
+        } catch (e: FileNotFoundException) {
+            viewer.showToast("File not found")
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    private val saveAsDoc = viewer.registerForActivityResult(
+        ActivityResultContracts
+            .CreateDocument("application/ntp")
+    ) {
+        if (it != null) {
+            if (isOk(it)) {
+                saveToFile(it)
+                uri = it
+                viewer.setTextFromFile("")
+            } else {
+                DocumentFile.fromSingleUri(viewer, it)?.delete()
+                viewer.showToast("File extension is not supported! ")
+            }
+        }
+    }
+    
+    override fun replace() {
+        TODO("Not yet implemented")
     }
 
     override fun dateAndTime() {
@@ -244,27 +513,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         TODO("Not yet implemented")
     }
 
-    override fun size() {
-        TODO("Not yet implemented")
-    }
-
     override fun fontFamily() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeBold() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeItalic() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeCursive() {
-        TODO("Not yet implemented")
-    }
-
-    override fun makeUnderlined() {
         TODO("Not yet implemented")
     }
 
@@ -288,15 +537,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         TODO("Not yet implemented")
     }
 
-    override fun alignLeft() {
-        TODO("Not yet implemented")
-    }
-
-    override fun alignRight() {
-        TODO("Not yet implemented")
-    }
-
-    override fun alignLeftAndLeft() {
+    override fun makeCursive() {
         TODO("Not yet implemented")
     }
 
@@ -312,101 +553,11 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         TODO("Not yet implemented")
     }
 
-    override fun save() {
-        saveToFile(uri)
-        viewer.showToast("File has been saved!")
-    }
-
-    override fun saveAs() {
-        val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
-        saveAsDoc.launch(u)
-    }
-
-    override fun print() {
-        val content : String = viewer.getEditText().text.toString()
-        if(content != ""){
-            val printDocument = PrintDocument(content,viewer)
-            printDocument.doPrint()
-        }
-        else {
-            viewer.showToast("Document is empty")
-        }
-    }
-
     override fun recent() {
-        TODO("Not yet implemented")
-    }
-
-    override fun aboutApp() {
         TODO("Not yet implemented")
     }
 
     override fun sentToEmail() {
         TODO("Not yet implemented")
-    }
-
-    override fun exit() {
-        TODO("Not yet implemented")
-    }
-
-    override fun onClick(v: View) {
-        when (v.id) {
-            R.id.editText -> {
-                viewer.keyBoardShow()
-            }
-        }
-    }
-
-    private fun isOk(uri: Uri): Boolean {
-        val fileName = DocumentFile.fromSingleUri(viewer, uri)?.name
-        if (fileName != null) {
-            if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
-                val extensionOfFile = fileName.substring(fileName.lastIndexOf(".") + 1)
-                if (extensionOfFile == "ntp"
-                    || extensionOfFile == "kt"
-                    || extensionOfFile == "swift"
-                    || extensionOfFile == "java") {
-                    val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
-                    val max = 5629273
-                    if (size != null) {
-                        return size < max
-                    }
-                }
-            }
-        }
-        return false
-    }
-
-    private fun saveToFile(uri: Uri) {
-        val text = viewer.getEditText().text.toString()
-        try {
-            viewer.contentResolver.openFileDescriptor(uri, "rw")?.use { content ->
-                FileOutputStream(content.fileDescriptor).use { fos ->
-                    fos.write(text.toByteArray())
-                    fos.flush()
-                    fos.close()
-                }
-            }
-        } catch (e: FileNotFoundException) {
-            viewer.showToast("File not found")
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
-    private val saveAsDoc = viewer.registerForActivityResult(
-        ActivityResultContracts
-            .CreateDocument("application/ntp")
-    ) {
-        if (it != null) {
-            if (isOk(it)) {
-                saveToFile(it)
-                uri = it
-                viewer.setTextFromFile("")
-            } else {
-                viewer.showToast("File extension is not supported!")
-            }
-        }
-
     }
 }

@@ -1,77 +1,54 @@
 package internlabs.dependencyinjection.notepadmvc.util
 
+import android.content.Context
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.pdf.PdfDocument
+import android.graphics.pdf.PdfDocument.PageInfo
 import android.os.Bundle
-
-import java.io.FileOutputStream
-
 import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor
-import android.print.PageRange
-import android.print.PrintAttributes
-import android.print.PrintDocumentAdapter
-import android.content.Context
-import android.print.PrintDocumentInfo
+import android.print.*
 import android.print.pdf.PrintedPdfDocument
-import android.graphics.pdf.PdfDocument.PageInfo
-import android.graphics.pdf.PdfDocument
-import java.lang.Exception
-import android.graphics.Color
-import android.graphics.Paint
-import android.print.PrintManager
-import internlabs.dependencyinjection.notepadmvc.R
-import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
+import java.io.FileOutputStream
+import kotlin.math.ceil
 
 
-class PrintDocument(private var text: String, viewer: Viewer) {
+class PrintDocument(private var text: String, context: Context, fonts: Paint) {
 
-    private val context = viewer
+    private var context: Context
+    private var fonts: Paint
 
+    init {
+        this.context = context
+        this.fonts = fonts
+    }
 
     fun doPrint() {
         context.also { context: Context ->
-            // Get a PrintManager instance
             val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
-            // Set job name, which will be displayed in the print queue
-            val jobName = "${context.getString(R.string.app_name)} Document"
-            // Start a print job, passing in a PrintDocumentAdapter implementation
-            // to handle the generation of a print document
-            printManager.print(jobName, MyPrintDocumentAdapter(context), null)
+            val newAttributes =
+                PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                    .setMinMargins(PrintAttributes.Margins(30, 35, 30, 30))
+                    .build()
+            val jobName = "NotepadMVC Document"
+            printManager.print(jobName, MyPrintDocumentAdapter(context), newAttributes)
         }
     }
 
 
     inner class MyPrintDocumentAdapter(private var context: Context) : PrintDocumentAdapter() {
+        private var rawString = ""
+        private var stringLines: List<String> = text.lines()
+        private var finalStringLines = mutableListOf<String>()
         private var pageHeight: Int = 0
         private var pageWidth: Int = 0
         private var myPdfDocument: PdfDocument? = null
-        private var totalPages = 1
-
-
-        private fun pageInRange(pageRanges: Array<PageRange>, page: Int): Boolean {
-            for (i in pageRanges.indices) {
-                if (page >= pageRanges[i].start && page <= pageRanges[i].end)
-                    return true
-            }
-            return false
-        }
-
-        private fun drawPage(page: PdfDocument.Page, pageNumber: Int) {
-            var pagenum = pageNumber
-            val canvas = page.canvas
-
-            //make sure page numbers start at 1
-
-            val titleBaseline = 72
-            val lefMargin = 54
-
-            val paint = Paint()
-            paint.color = Color.BLACK
-            paint.textSize = 40f
-            paint.textSize = 20f
-
-            canvas.drawText(text, lefMargin.toFloat(), (titleBaseline + 35).toFloat(), paint)
-
-        }
+        private var totalPages = 2
+        private var titleBaseline = 1
+        private var leftMargin = 30
+        private var textHeight = 39
+        private var itemsPerPage = 0
 
         override fun onLayout(
             oldAttributes: PrintAttributes,
@@ -79,19 +56,19 @@ class PrintDocument(private var text: String, viewer: Viewer) {
             cancellationSignal: CancellationSignal,
             callback:
             PrintDocumentAdapter.LayoutResultCallback,
-            metadata: Bundle
+            metadata: Bundle,
         ) {
             myPdfDocument = PrintedPdfDocument(context, newAttributes)
-
             val height = newAttributes.mediaSize?.heightMils
             val width = newAttributes.mediaSize?.widthMils
-
             height?.let {
                 pageHeight = it / 1000 * 72
             }
             width?.let {
                 pageWidth = it / 1000 * 72
             }
+            makeCorrectLines()
+            totalPages = computePageCount()
             if (cancellationSignal.isCanceled) {
                 callback.onLayoutCancelled()
                 println("cancelled")
@@ -104,26 +81,37 @@ class PrintDocument(private var text: String, viewer: Viewer) {
                     ).setPageCount(totalPages)
                 val info = builder.build()
                 callback.onLayoutFinished(info, true)
-
             } else {
                 callback.onLayoutFailed("Page count is zero.")
-
-
             }
 
+        }
+
+        private fun makeCorrectLines() {
+            for (index in stringLines.indices) {
+                if (fonts.measureText(stringLines[index]).toInt() > (pageWidth-35)) {
+                    rawString = stringLines[index]
+                    while (fonts.measureText(rawString).toInt() > (pageWidth-35)) {
+                        newLine(rawString)
+                    }
+                    finalStringLines.add(rawString)
+                    rawString=""
+                } else {
+                    finalStringLines.add(stringLines[index])
+                }
+            }
         }
 
         override fun onWrite(
             pageRanges: Array<PageRange>,
             destination: ParcelFileDescriptor,
             cancellationSignal: CancellationSignal,
-            callback: WriteResultCallback
-
+            callback: WriteResultCallback,
         ) {
+            println("*******************ON WRITE*****************")
             for (i in 0 until totalPages) {
                 if (pageInRange(pageRanges, i)) {
                     val newPage = PageInfo.Builder(pageWidth, pageHeight, i).create()
-
                     val page = myPdfDocument?.startPage(newPage)
 
                     if (cancellationSignal.isCanceled) {
@@ -147,10 +135,96 @@ class PrintDocument(private var text: String, viewer: Viewer) {
             } finally {
                 myPdfDocument?.close()
                 myPdfDocument = null
-
+                stringLines = emptyList()
+                finalStringLines.clear()
             }
             callback.onWriteFinished(pageRanges)
 
+        }
+
+        private fun computePageCount(): Int {
+            val bounds = Rect()
+
+            fonts.getTextBounds(text, 0, text.length, bounds)
+            textHeight = bounds.height()-4
+            val printArea = pageHeight - titleBaseline * 2
+            itemsPerPage = printArea / (textHeight + 16) // default item count for portrait mode
+
+            val printItemCount: Int = finalStringLines.size
+            return ceil((printItemCount / itemsPerPage.toDouble())).toInt()
+        }
+
+        private fun goToHardNewLine(beforeLast: String) {
+            var tmp = ""
+            beforeLast.forEach {
+                tmp += it.toString()
+                if (fonts.measureText(tmp).toInt() > (pageWidth - 70)) {
+                    finalStringLines.add("$tmp -")
+                    tmp = ""
+                }
+            }
+            if (tmp.isNotEmpty()){
+                finalStringLines.add(tmp)
+            }
+        }
+
+        private fun newLine(s: String) {
+            val beforeLast: String = if (s.contains(' ')) {
+                s.substringBeforeLast(' ')
+            } else {
+                s
+            }
+            if (fonts.measureText(beforeLast).toInt() > (pageWidth-35)) {
+                if (beforeLast.contains(' ')) {
+                    newLine(beforeLast)
+                } else {
+                    goToHardNewLine(beforeLast)
+                    rawString = rawString.substring(beforeLast.length)
+                }
+            } else {
+                finalStringLines.add(beforeLast)
+                rawString = rawString.substring(beforeLast.length+1)
+            }
+        }
+
+        private fun pageInRange(pageRanges: Array<PageRange>, page: Int): Boolean {
+            for (i in pageRanges.indices) {
+                if (page >= pageRanges[i].start && page <= pageRanges[i].end)
+                    return true
+            }
+            return false
+        }
+
+        private var index = 0
+        private fun drawPage(page: PdfDocument.Page, pageNumber: Int) {
+            val canvas = page.canvas
+            var maxItem = 0
+            titleBaseline = 1
+            for (i in index until finalStringLines.size) {
+                if (maxItem == itemsPerPage) {
+                    break
+                }
+                if (i == 0){
+                    canvas.drawText("", leftMargin.toFloat(),
+                        ((textHeight) * titleBaseline).toFloat(), fonts)
+                    titleBaseline++
+                    titleBaseline++
+                    canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
+                        ((textHeight) * titleBaseline).toFloat(), fonts)
+                } else {
+                    canvas.drawText(finalStringLines[i], leftMargin.toFloat(),
+                        ((textHeight) * titleBaseline).toFloat(), fonts)
+                }
+                index++
+                maxItem++
+                titleBaseline++
+                titleBaseline++
+            }
+
+            canvas.drawText((pageNumber + 1).toString(),
+                (page.info.pageWidth / 2).toFloat(),
+                pageHeight.toFloat(),
+                fonts)
         }
     }
 }
