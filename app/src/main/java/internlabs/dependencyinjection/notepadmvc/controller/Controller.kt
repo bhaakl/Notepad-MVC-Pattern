@@ -1,12 +1,11 @@
 package internlabs.dependencyinjection.notepadmvc.controller
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Color
-import android.app.Dialog
-import android.content.*
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -18,17 +17,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.AdapterView
+import android.widget.EditText
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.navigation.NavigationView
-
 import internlabs.dependencyinjection.notepadmvc.R
 import internlabs.dependencyinjection.notepadmvc.util.BMooreMatchText
 import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
@@ -288,7 +285,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     override fun find() {
         val inflater: LayoutInflater = LayoutInflater.from(viewer)
         val view: View = inflater.inflate(R.layout.feature_find, null)
-        val mBuilder = androidx.appcompat.app.AlertDialog.Builder(viewer)
+        val mBuilder = AlertDialog.Builder(viewer)
             .setTitle("Find")
             .setIcon(R.drawable.ic_search_in)
             .setView(view)
@@ -297,9 +294,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setCancelable(true)
             .show()
 
-        val mPositiveButton = mBuilder.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+        val mPositiveButton = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
         mPositiveButton.setTextColor(Color.CYAN)
-        val mNegativeButton = mBuilder.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)
+        val mNegativeButton = mBuilder.getButton(AlertDialog.BUTTON_NEGATIVE)
         mNegativeButton.setTextColor(Color.RED)
         val editTextFind = view.findViewById<EditText>(R.id.findWhat)
 
@@ -396,6 +393,10 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         editText.text = spannableString
     }
 
+    override fun makeCursive() {
+        TODO("Not yet implemented")
+    }
+
     override fun makeUnderlined() {
         val editText = viewer.getEditText()
         val spannableString = SpannableStringBuilder(editText.text)
@@ -487,7 +488,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     override fun aboutApp() {
-        dialog = Dialog(viewer)
+        val dialog = Dialog(viewer)
         dialog.setContentView(R.layout.dialog_layout)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
