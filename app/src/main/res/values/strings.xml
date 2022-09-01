@@ -30,10 +30,7 @@
         <item>"25"</item>
         <item>"30"</item>
         <item>"35"</item>
-
     </array>
     <string name="content_description_search">Find</string>
-    <string name="content_description_more">See more</string>
-    <string name="content_description_print">Print document</string>
-    <string name="more">Show more</string>
+    <string name="dateT">Date/Time</string>
 </resources>

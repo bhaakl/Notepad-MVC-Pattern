@@ -31,21 +31,10 @@
                     android:title="@string/save_as" />
 
                 <item
-                    android:id="@+id/recent"
-                    android:checkable="true"
-                    android:icon="@drawable/ic_recent"
-                    android:title="@string/recent" />
-                <item
                     android:id="@+id/printDocument"
                     android:checkable="true"
                     android:icon="@drawable/ic_baseline_print"
                     android:title="@string/print"/>
-
-                <item
-                    android:id="@+id/settings"
-                    android:checkable="true"
-                    android:icon="@drawable/ic_settings"
-                    android:title="@string/settings" />
 
             </menu>
         </item>
@@ -107,6 +96,12 @@
                     android:icon="@drawable/ic_search_in"
                     android:title="@string/search_in" />
 
+                <item
+                    android:id="@+id/dateAndTime"
+                    android:checkable="true"
+                    android:icon="@drawable/ic_search_in"
+                    android:title="@string/dateT" />
+
             </menu>
         </item>
 
@@ -119,23 +114,6 @@
             android:id="@+id/subMenu3"
             android:title="@string/other">
             <menu>
-                <item
-                    android:id="@+id/exit"
-                    android:icon="@drawable/ic_exit_to_app"
-                    android:checkable="true"
-                    android:title="@string/exit"/>
-
-                <item
-                    android:id="@+id/send"
-                    android:icon="@drawable/ic_send"
-                    android:checkable="true"
-                    android:title="@string/send" />
-
-                <item
-                    android:id="@+id/howToUse"
-                    android:icon="@drawable/ic_how_to_use"
-                    android:checkable="true"
-                    android:title="@string/how_to_use" />
 
                 <item
                     android:id="@+id/about_app"
@@ -143,10 +121,15 @@
                     android:checkable="true"
                     android:title="@string/about_app" />
 
+                <item
+                    android:id="@+id/exit"
+                    android:icon="@drawable/ic_exit_to_app"
+                    android:checkable="true"
+                    android:title="@string/exit"/>
+
             </menu>
         </item>
 
     </group>
-
 
 </menu>

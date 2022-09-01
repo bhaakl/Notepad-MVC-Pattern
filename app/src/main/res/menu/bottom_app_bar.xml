@@ -45,41 +45,4 @@
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
 
-    <item
-        android:id="@+id/saveBtm"
-        android:icon="@drawable/ic_save_file_btm"
-        android:title="@string/save"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction" />
-
-    <item
-        android:id="@+id/openFileBtm"
-        android:icon="@drawable/ic_open_file_btm"
-        android:title="@string/open"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/saveAsBtm"
-        android:icon="@drawable/ic_save_as_file_btm"
-        android:title="@string/save_as"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/printDocumentBtm"
-        android:contentDescription="@string/content_description_print"
-        android:icon="@drawable/ic_print_doc_btm"
-        android:title="@string/print"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/settingsBtm"
-        android:icon="@drawable/ic_settings_btm"
-        android:title="@string/settings"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/more"
-        android:contentDescription="@string/content_description_more"
-        android:title="@string/more"
-        app:showAsAction="never" />
 </menu>

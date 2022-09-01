@@ -35,24 +35,4 @@
         <item name="android:editTextBackground">@color/white</item>
     </style>
 
-    <style name="Theme.NotepadMvcMaterial3DayNightNoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:editTextBackground">@color/white</item>
-    </style>
-
-    <style name="Theme.NotepadMvcMaterial3LightNoActionBar" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:editTextBackground">@color/white</item>
-    </style>
-
-    <style name="Theme.NotepadMvcMaterialComponentLightNoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:editTextBackground">@color/white</item>
-    </style>
-
-    <style name="Theme.NotepadMvcMaterialComponentDarkNoActionBar" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:editTextBackground">@color/black</item>
-    </style>
-
 </resources>

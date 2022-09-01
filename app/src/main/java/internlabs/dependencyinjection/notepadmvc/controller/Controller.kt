@@ -21,6 +21,7 @@ import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
@@ -32,6 +33,8 @@ import internlabs.dependencyinjection.notepadmvc.util.PrintDocument
 import internlabs.dependencyinjection.notepadmvc.util.TextEditor
 import internlabs.dependencyinjection.notepadmvc.viewer.Viewer
 import java.io.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.system.exitProcess
 
 //-
@@ -47,6 +50,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     // DrawerLayout click handler
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.openFile -> {
@@ -101,6 +105,9 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             R.id.searchText -> {
                 find()
             }
+            R.id.dateAndTime -> {
+                dateAndTime()
+            }
         }
         item.isChecked = true
         viewer.getDrawerLayout().close()
@@ -110,29 +117,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     // bottomAppBar click handler
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         return when (item?.itemId) {
-            R.id.more -> {
-                viewer.getDrawerLayout().open()
-                true
-            }
-            R.id.printDocumentBtm -> {
-                print()
-                true
-            }
-            R.id.saveAsBtm -> {
-                saveAs()
-                viewer.getUndoRedoManager().clearHistory()
-                true
-            }
-            R.id.openFileBtm -> {
-                open()
-                viewer.getUndoRedoManager().clearHistory()
-                true
-            }
-            R.id.saveBtm -> {
-                save()
-                viewer.getUndoRedoManager().clearHistory()
-                true
-            }
             R.id.newFileBtm -> {
                 new()
                 viewer.getUndoRedoManager().clearHistory()
@@ -295,7 +279,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .show()
 
         val mPositiveButton = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
-        mPositiveButton.setTextColor(Color.CYAN)
         val mNegativeButton = mBuilder.getButton(AlertDialog.BUTTON_NEGATIVE)
         mNegativeButton.setTextColor(Color.RED)
         val editTextFind = view.findViewById<EditText>(R.id.findWhat)
@@ -329,8 +312,12 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
         viewer.getEditText().selectAll()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun dateAndTime() {
-        TODO("Not yet implemented")
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy")
+        val formatted = current.format(formatter)
+        viewer.setTextForEditor(formatted)
     }
 
     override fun zoomIn() {

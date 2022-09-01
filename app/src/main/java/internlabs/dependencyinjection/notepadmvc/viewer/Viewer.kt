@@ -1,11 +1,6 @@
 package internlabs.dependencyinjection.notepadmvc.viewer
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
