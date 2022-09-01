@@ -2,6 +2,10 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
@@ -27,11 +31,9 @@ class Viewer : AppCompatActivity() {
         controller = Controller(viewer = this)
     }
 
-    @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityViewerBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
         //in landscape mode hide bottomAppBar
         binding.bottomAppBar.isVisible =
