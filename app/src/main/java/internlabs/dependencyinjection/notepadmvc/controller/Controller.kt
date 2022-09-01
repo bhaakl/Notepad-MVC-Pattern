@@ -115,13 +115,13 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             if (isOk(uri1)) {
                 val byteData = getText(viewer, uri1)
                 byteData?.let { String(it) }?.let {
-                    println(it)
+                    //println(it)
                     viewer.setTextFromFile(it)
                 }
                 uri = uri1
                 viewer.makeEditTextEditable()
             } else {
-                Toast.makeText(viewer, "Файл не поддерживается!", Toast.LENGTH_LONG)
+                viewer.showToast("Файл не поддерживается!")
             }
         }
     }
@@ -424,7 +424,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     //-- служебный метод Фильтр для файлов()
     private fun isOk(uri: Uri): Boolean {
         val fullFileName = DocumentFile.fromSingleUri(viewer, uri)?.name
-        println(fullFileName)
         var dotCount = 0
         fullFileName?.forEach {
             if (it == '.'){
@@ -436,15 +435,14 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 var extensionOfFile = fullFileName.substring(fullFileName.lastIndexOf(".") + 1)
                 extensionOfFile = extensionOfFile.substringBefore(" ")
                 val fileName = fullFileName.substringBefore(".")
-                println(extensionOfFile)
-                println(isCorrectName(fileName))
                 if (isCorrectName(fileName)) {
                     if (extensionOfFile == "ntp"
                         || extensionOfFile == "kt"
                         || extensionOfFile == "swift"
                         || extensionOfFile == "java") {
                         val size = DocumentFile.fromSingleUri(viewer, uri)?.length()
-                        val max = 5629273
+                        println("size          $size" )
+                        val max = 5823577
                         if (size != null) {
                             return size < max
                         }
@@ -458,7 +456,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     private fun isCorrectName(fileName: String): Boolean {
         fileName.forEach {
             val int: Int = it.code.toInt()
-            println("int    $int")
             if (int in 65..90 || int in 97..122){
                 println("")
             } else {

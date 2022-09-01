@@ -63,16 +63,12 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             val width = newAttributes.mediaSize?.widthMils
             height?.let {
                 pageHeight = it / 1000 * 72
-                println(pageHeight)
             }
             width?.let {
                 pageWidth = it / 1000 * 72
-                println(pageWidth)
             }
             makeCorrectLines()
             totalPages = computePageCount()
-            println("totalPage    $totalPages")
-
             if (cancellationSignal.isCanceled) {
                 callback.onLayoutCancelled()
                 println("cancelled")
@@ -153,16 +149,6 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             textHeight = bounds.height()-4
             val printArea = pageHeight - titleBaseline * 2
             itemsPerPage = printArea / (textHeight + 16) // default item count for portrait mode
-            /*if (pageSize != null) {
-                if (!pageSize.isPortrait) {
-                    // Six items per page in landscape orientation
-                    itemsPerPage = 6
-                }
-            }*/
-
-            // Determine number of print items
-            println(itemsPerPage)
-            println(finalStringLines.size)
 
             val printItemCount: Int = finalStringLines.size
             return ceil((printItemCount / itemsPerPage.toDouble())).toInt()
@@ -214,8 +200,6 @@ class PrintDocument(private var text: String, context: Context, fonts: Paint) {
             val canvas = page.canvas
             var maxItem = 0
             titleBaseline = 1
-            println("item count   $itemsPerPage")
-
             for (i in index until finalStringLines.size) {
                 if (maxItem == itemsPerPage) {
                     break
