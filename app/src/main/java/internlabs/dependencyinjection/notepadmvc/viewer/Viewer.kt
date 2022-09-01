@@ -2,6 +2,10 @@ package internlabs.dependencyinjection.notepadmvc.viewer
 
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnimationUtils

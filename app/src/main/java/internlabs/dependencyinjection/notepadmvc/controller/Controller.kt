@@ -251,7 +251,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
                 id: Long,
             ) {
                 when (spinner.selectedItemPosition) {
-                    1 -> editText.textSize = 20f
+                    1 -> editText.textSize = 18f
                     2 -> editText.textSize = 25f
                     3 -> editText.textSize = 30f
                     4 -> editText.textSize = 35f
@@ -260,7 +260,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
-
     }
 
     override fun makeBold() {
@@ -332,7 +331,6 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             val u = DocumentFile.fromSingleUri(viewer, uri)?.name.toString()
             saveAsDoc.launch(u)
         }
-
     }
 
     override fun print() {
@@ -369,7 +367,8 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             .setNegativeButton(" Yes") { _, _ ->
                 clearUndoRedoHistory()
                 manager.disconnect()
-                exitProcess(0)
+                //exitProcess(0)
+                viewer.finish()
             }
         alertDialog.show()
     }
@@ -497,7 +496,7 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
             }
         }
     }
-    
+
     override fun replace() {
         TODO("Not yet implemented")
     }
