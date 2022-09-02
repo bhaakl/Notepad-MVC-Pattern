@@ -170,20 +170,22 @@ class Controller(viewer: Viewer) : OurTasks, View.OnClickListener,
     }
 
     private fun getText(context: Context, uri: Uri): CharArray? {
+        val inputStream: InputStream?
+        val bfr: BufferedReader?
         return try {
-            val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-            val bfr = BufferedReader(InputStreamReader(inputStream))
-            val buffer = StringBuilder()
-            var buf: CharArray? = CharArray(10)
-            var numRead: Int
-            while (bfr.read(buf).also { numRead = it } != -1) {
-                val readData = String(buf!!, 0, numRead)
-                buffer.append(readData)
-                buf = CharArray(1024)
+            inputStream = context.contentResolver.openInputStream(uri)
+            bfr = BufferedReader(InputStreamReader(inputStream))
+            val buffer = ArrayList<String>()
+            var bfrRead: String? = bfr.readLine()
+            while (null != bfrRead) {
+                buffer.add(bfrRead)
+                bfrRead = bfr.readLine()
             }
+            val readData: String = buffer.joinToString("\n")
+            buffer.clear()
             inputStream?.close()
             bfr.close()
-            buffer.toString().toCharArray()
+            readData.toCharArray()
         } catch (ex: Exception) {
             Log.e("Error", ex.message.toString())
             viewer.showToast("getText error: ${ex.message}")

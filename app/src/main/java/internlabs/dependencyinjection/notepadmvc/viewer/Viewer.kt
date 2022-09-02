@@ -4,7 +4,6 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
@@ -144,7 +143,6 @@ class Viewer : AppCompatActivity() {
             alignRight.isClickable = true
             isOpenFab = true
         }
-
     }
 
     fun close() {
@@ -155,30 +153,12 @@ class Viewer : AppCompatActivity() {
     fun getFonts(): Paint {
         val paint = Paint()
         val spSize = binding.editText.textSize
-        paint.textAlign = getTextAlignment()
         paint.textSize = spSize / 100 * 74
         paint.textLocale = binding.editText.textLocale
         paint.letterSpacing = binding.editText.letterSpacing
         paint.typeface = Typeface.create(binding.editText.typeface, getTypeface())
         paint.color = binding.editText.currentTextColor
         return paint
-    }
-
-    private fun getTextAlignment(): Paint.Align {
-        when (binding.editText.textAlignment) {
-            View.TEXT_ALIGNMENT_TEXT_START -> return Paint.Align.LEFT
-            View.TEXT_ALIGNMENT_CENTER -> return Paint.Align.CENTER
-            View.TEXT_ALIGNMENT_TEXT_END -> return Paint.Align.RIGHT
-            View.TEXT_ALIGNMENT_GRAVITY -> {
-                return Paint.Align.LEFT
-            }
-            View.TEXT_ALIGNMENT_INHERIT -> {
-                return Paint.Align.LEFT
-            }
-            View.TEXT_ALIGNMENT_VIEW_END -> return Paint.Align.RIGHT
-            View.TEXT_ALIGNMENT_VIEW_START -> return Paint.Align.LEFT
-        }
-        return Paint.Align.LEFT
     }
 
     private fun getTypeface(): Int {

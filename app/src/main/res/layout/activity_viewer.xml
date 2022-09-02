@@ -16,14 +16,14 @@
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout2"
-            style="@style/Widget.MaterialComponents.AppBarLayout.PrimarySurface"
+            style="@style/Widget.MaterialComponents.AppBarLayout.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/imageMenu"
-                style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
